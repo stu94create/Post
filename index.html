@@ -400,6 +400,16 @@ font-size: 1rem;
 }
 .chip-remove:hover { background: rgba(168, 66, 58, 0.1); }
 
+.chip-list.editing .chip { background: rgba(168, 66, 58, 0.08); border-color: var(--warn); }
+.chip-list.editing .chip-add { color: var(--warn); }
+.chip-list.editing .chip-add:hover { background: rgba(168, 66, 58, 0.12); }
+
+#edit-mentions-btn[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
 .empty-note {
 color: var(--muted);
 font-style: italic;
@@ -650,6 +660,7 @@ text-align: center;
       </div>
     </div>
     <h3>Saved mentions</h3>
+    <button id="edit-mentions-btn" class="btn small" type="button" aria-pressed="false">Edit list</button>
     <div id="mention-favs" class="chip-list"></div>
   </div>
 </div>
@@ -902,11 +913,21 @@ text-align: center;
     });
   }
 
+  let mentionEditMode = false;
+
   function renderMentionFavs() {
     const favs = store_get('mentionFavs') || [];
     const container = $('mention-favs');
+    const editBtn = $('edit-mentions-btn');
     container.innerHTML = '';
+    container.classList.toggle('editing', mentionEditMode && favs.length > 0);
+    if (editBtn) {
+      editBtn.hidden = favs.length === 0;
+      editBtn.setAttribute('aria-pressed', String(mentionEditMode));
+      editBtn.textContent = mentionEditMode ? 'Done' : 'Edit list';
+    }
     if (!favs.length) {
+      mentionEditMode = false;
       const p = document.createElement('p');
       p.className = 'empty-note';
       p.textContent = 'No saved mentions yet.';
@@ -916,30 +937,37 @@ text-align: center;
     favs.forEach((m) => {
       const chip = document.createElement('div');
       chip.className = 'chip';
-      const copy = document.createElement('button');
-      copy.type = 'button'; copy.className = 'chip-add';
-      copy.textContent = '@' + m;
-      copy.setAttribute('aria-label', 'Copy @' + m + ' to clipboard');
-      copy.addEventListener('click', async () => {
-        const ok = await copyToClipboard('@' + m);
-        showStatus(ok ? 'Copied @' + m : 'Could not copy @' + m);
-      });
-      const del = document.createElement('button');
-      del.type = 'button'; del.className = 'chip-remove';
-      del.textContent = '✕';
-      del.setAttribute('aria-label', 'Remove @' + m + ' from saved mentions');
-      del.addEventListener('click', () => {
-        if (!confirm('Remove @' + m + ' from saved mentions?')) return;
-        const f = (store_get('mentionFavs') || []).filter(x => x !== m);
-        store_set('mentionFavs', f);
-        renderMentionFavs();
-        updateSummaries();
-        showStatus('Removed @' + m);
-      });
-      chip.appendChild(copy);
-      chip.appendChild(del);
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'chip-add';
+      btn.textContent = '@' + m;
+      if (mentionEditMode) {
+        btn.setAttribute('aria-label', 'Remove @' + m + ' from saved mentions');
+        btn.addEventListener('click', () => {
+          if (!confirm('Remove @' + m + ' from saved mentions?')) return;
+          const f = (store_get('mentionFavs') || []).filter(x => x !== m);
+          store_set('mentionFavs', f);
+          renderMentionFavs();
+          updateSummaries();
+          showStatus('Removed @' + m);
+        });
+      } else {
+        btn.setAttribute('aria-label', '@' + m);
+        btn.addEventListener('click', async () => {
+          const ok = await copyToClipboard('@' + m);
+          showStatus(ok ? 'Copied @' + m : 'Could not copy @' + m);
+        });
+      }
+      chip.appendChild(btn);
       container.appendChild(chip);
     });
+  }
+
+  function toggleMentionEdit() {
+    const favs = store_get('mentionFavs') || [];
+    if (!favs.length) return;
+    mentionEditMode = !mentionEditMode;
+    renderMentionFavs();
+    showStatus(mentionEditMode ? 'Edit mode on — tap a mention to remove it.' : 'Edit mode off.');
   }
 
   function addMentionFavourite() {
@@ -1613,6 +1641,7 @@ text-align: center;
   $('new-mention-input').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); addMentionFavourite(); }
   });
+  $('edit-mentions-btn').addEventListener('click', toggleMentionEdit);
   $('save-hashtag-favs-btn').addEventListener('click', saveHashtagsToFavs);
   $('save-template-btn').addEventListener('click', saveTemplate);
   $('template-name').addEventListener('keydown', (e) => {
