@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5efe2;
+    --bg-2: #ede4cc;
+    --surface: #ffffff;
+    --surface-2: #fbf6ea;
+    --surface-3: #f0e9d8;
+    --surface-hero: #fff8ea;
+    --border: #e3d9bf;
+    --border-strong: #c9bb98;
+    --ink: #1f1a14;
+    --ink-2: #3d3327;
+    --muted: #6f6045;
+    --accent: #b04a2e;
+    --accent-2: #d97757;
+    --accent-soft: #f7e3d6;
+    --warn: #a8423a;
+    --ok: #4a6b3a;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 2px rgba(31, 26, 20, 0.06);
+    --shadow: 0 2px 4px rgba(31, 26, 20, 0.05), 0 8px 16px -8px rgba(31, 26, 20, 0.08);
+  }
+
+@media (prefers-color-scheme: dark) {
+:root {
+–bg: #14110d;
+–bg-2: #0c0a08;
+–surface: #1f1a14;
+–surface-2: #271f17;
+–surface-3: #2f261c;
+–surface-hero: #2a1f15;
+–border: #3a3024;
+–border-strong: #5a4a37;
+–ink: #f4ecd9;
+–ink-2: #d8cdb8;
+–muted: #a89980;
+–accent: #e08160;
+–accent-2: #f0a37b;
+–accent-soft: #3d2620;
+–warn: #e8826f;
+–ok: #a8c890;
+–shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+–shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.4);
+}
+}
+
+- { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+body {
+margin: 0;
+background: var(–bg);
+background-image:
+radial-gradient(circle at 12% 8%, var(–accent-soft) 0%, transparent 38%),
+radial-gradient(circle at 88% 92%, var(–bg-2) 0%, transparent 50%);
+background-attachment: fixed;
+color: var(–ink);
+font-family: ‘Atkinson Hyperlegible’, sans-serif;
+font-size: 17px;
+line-height: 1.55;
+-webkit-font-smoothing: antialiased;
+min-height: 100vh;
+}
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 28px 20px 80px; }
+
+header.page {
+padding: 12px 0 28px;
+margin-bottom: 24px;
+}
+h1 {
+font-family: ‘EB Garamond’, serif;
+font-weight: 600;
+font-size: 2.85rem;
+line-height: 1;
+margin: 0;
+letter-spacing: -0.025em;
+color: var(–ink);
+}
+h1 .accent-mark { color: var(–accent); margin-left: 2px; }
+.title-flourish {
+display: flex;
+align-items: center;
+gap: 10px;
+margin: 16px 0 0;
+color: var(–accent);
+}
+.title-flourish::before {
+content: ‘’;
+flex: 0 0 32px;
+height: 1.5px;
+background: var(–accent);
+border-radius: 2px;
+}
+.title-flourish::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+.subtitle {
+margin: 16px 0 0;
+color: var(–muted);
+font-size: 0.95rem;
+max-width: 56ch;
+line-height: 1.5;
+}
+
+/* Group headings (h2) */
+h2.group-heading {
+font-family: ‘EB Garamond’, serif;
+font-weight: 500;
+font-style: italic;
+color: var(–muted);
+font-size: 1.05rem;
+margin: 30px 4px 12px;
+letter-spacing: 0.01em;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+h2.group-heading::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+h2.group-heading:first-of-type { margin-top: 0; }
+
+/* Section cards */
+.section {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+margin-bottom: 10px;
+box-shadow: var(–shadow-sm);
+overflow: hidden;
+transition: box-shadow 0.2s, border-color 0.15s;
+}
+.section:has(.section-toggle[aria-expanded=“true”]) {
+box-shadow: var(–shadow);
+border-color: var(–border-strong);
+}
+
+.section.hero {
+background: var(–surface-hero);
+border: 1.5px solid var(–border-strong);
+border-radius: var(–radius-lg);
+box-shadow: var(–shadow);
+margin-bottom: 14px;
+}
+.section.hero .section-toggle {
+background: transparent;
+padding: 22px 22px;
+min-height: 68px;
+font-size: 1.5rem;
+}
+.section.hero .section-toggle:hover { background: rgba(176, 74, 46, 0.04); }
+.section.hero .section-toggle[aria-expanded=“true”] { background: transparent; }
+.section.hero .section-body { padding: 4px 22px 24px; }
+.section.hero .section-icon-glyph {
+background: var(–accent);
+color: var(–surface-hero);
+}
+@media (prefers-color-scheme: dark) {
+.section.hero .section-icon-glyph { color: var(–surface-hero); }
+}
+
+.section-toggle {
+width: 100%;
+cursor: pointer;
+padding: 16px 18px;
+font-family: ‘EB Garamond’, serif;
+font-weight: 600;
+font-size: 1.25rem;
+min-height: 60px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+user-select: none;
+background: var(–surface);
+border: 0;
+color: var(–ink);
+text-align: left;
+margin: 0;
+-webkit-tap-highlight-color: transparent;
+}
+.section-toggle:hover { background: var(–surface-2); }
+.section-toggle[aria-expanded=“true”] {
+border-bottom: 1px solid var(–border);
+background: var(–surface-2);
+}
+.section-toggle:focus-visible {
+outline: 3px solid var(–accent-2);
+outline-offset: -3px;
+border-radius: var(–radius);
+}
+.toggle-content {
+flex: 1;
+display: flex;
+align-items: center;
+gap: 12px;
+min-width: 0;
+}
+.section-icon-glyph {
+flex-shrink: 0;
+width: 32px;
+height: 32px;
+border-radius: 8px;
+background: var(–accent-soft);
+color: var(–accent);
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.section-icon-glyph svg { display: block; }
+.toggle-text { min-width: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.summary-count {
+color: var(–accent);
+font-weight: 700;
+font-size: 0.78rem;
+font-family: ‘Atkinson Hyperlegible’, sans-serif;
+padding: 2px 9px;
+background: var(–accent-soft);
+border-radius: 12px;
+letter-spacing: 0.02em;
+}
+.section-chevron {
+flex-shrink: 0;
+color: var(–muted);
+transition: transform 0.2s ease-out;
+display: block;
+}
+.section-toggle[aria-expanded=“true”] .section-chevron {
+transform: rotate(180deg);
+color: var(–accent);
+}
+
+.section-body { padding: 4px 20px 22px; }
+.section-body[hidden] { display: none; }
+.section-body > p.hint:first-child { margin-top: 14px; }
+
+h3 {
+font-family: ‘EB Garamond’, serif;
+font-weight: 600;
+font-size: 1.1rem;
+margin: 22px 0 10px;
+color: var(–ink-2);
+letter-spacing: -0.005em;
+}
+
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.hint {
+margin: 0 0 10px;
+color: var(–muted);
+font-size: 0.875rem;
+font-style: italic;
+line-height: 1.45;
+}
+
+textarea, input[type=“text”] {
+width: 100%;
+font-family: ‘Atkinson Hyperlegible’, sans-serif;
+font-size: 1rem;
+line-height: 1.5;
+padding: 12px 14px;
+border: 1.5px solid var(–border-strong);
+border-radius: var(–radius-sm);
+background: var(–surface);
+color: var(–ink);
+min-height: 48px;
+transition: border-color 0.15s, box-shadow 0.15s;
+}
+textarea { min-height: 110px; resize: vertical; }
+textarea:hover, input[type=“text”]:hover { border-color: var(–ink-2); }
+textarea:focus, input[type=“text”]:focus,
+button:focus-visible, label.file-button:focus-within {
+outline: 3px solid var(–accent-2);
+outline-offset: 2px;
+}
+textarea:focus, input[type=“text”]:focus {
+border-color: var(–accent);
+outline-offset: -1px;
+}
+
+fieldset {
+border: 1.5px solid var(–border);
+border-radius: var(–radius-sm);
+padding: 14px 16px 16px;
+margin: 0;
+}
+legend { padding: 0 6px; font-weight: 700; font-size: 0.95rem; }
+.radio {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 4px;
+font-weight: 400;
+cursor: pointer;
+min-height: 36px;
+padding: 4px 0;
+}
+.radio:last-child { margin-bottom: 0; }
+.radio input[type=“radio”] {
+width: 22px; height: 22px;
+accent-color: var(–accent);
+flex-shrink: 0;
+}
+
+.count {
+margin-top: 8px;
+font-size: 0.8rem;
+color: var(–muted);
+text-align: right;
+font-feature-settings: ‘tnum’;
+}
+.count.over { color: var(–warn); font-weight: 700; }
+
+.mention-row {
+display: flex;
+gap: 8px;
+margin-bottom: 8px;
+align-items: center;
+}
+.mention-row .at-prefix {
+color: var(–accent);
+font-weight: 700;
+font-size: 1.05rem;
+flex-shrink: 0;
+width: 14px;
+text-align: center;
+}
+.mention-row input { flex: 1; min-width: 0; }
+.mention-row .btn { margin: 0; flex-shrink: 0; }
+
+.chip-list {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-top: 4px;
+}
+.chip {
+display: inline-flex;
+align-items: stretch;
+background: var(–accent-soft);
+border: 1px solid var(–border-strong);
+border-radius: 22px;
+overflow: hidden;
+}
+.chip:hover { box-shadow: var(–shadow-sm); }
+.chip-add, .chip-remove {
+background: none;
+border: 0;
+font-family: inherit;
+cursor: pointer;
+color: var(–ink);
+min-height: 42px;
+font-size: 0.92rem;
+-webkit-tap-highlight-color: transparent;
+}
+.chip-add { padding: 8px 14px; font-weight: 700; color: var(–accent); }
+.chip-add:hover { background: rgba(176, 74, 46, 0.08); }
+.chip-remove {
+padding: 8px 11px;
+border-left: 1px solid var(–border-strong);
+color: var(–warn);
+font-weight: 700;
+min-width: 40px;
+font-size: 1rem;
+}
+.chip-remove:hover { background: rgba(168, 66, 58, 0.1); }
+
+.empty-note {
+color: var(–muted);
+font-style: italic;
+font-size: 0.9rem;
+margin: 8px 0 0;
+}
+
+/* Preview post card (inside Preview section) */
+.post-card {
+background: var(–surface-2);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+overflow: hidden;
+margin-top: 14px;
+}
+.post-card-header {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 12px 16px;
+border-bottom: 1px solid var(–border);
+background: var(–surface);
+}
+.post-card-avatar {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(–accent) 0%, var(–accent-2) 100%);
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+color: #fff;
+font-family: ‘EB Garamond’, serif;
+font-weight: 600;
+font-size: 1rem;
+}
+@media (prefers-color-scheme: dark) {
+.post-card-avatar { color: #1a1410; }
+}
+.post-card-meta {
+display: flex;
+flex-direction: column;
+line-height: 1.2;
+min-width: 0;
+}
+.post-card-name { font-weight: 700; font-size: 0.92rem; color: var(–ink); }
+.post-card-time { font-size: 0.76rem; color: var(–muted); margin-top: 2px; }
+.post-card-body { padding: 14px 16px 16px; }
+.preview {
+white-space: pre-wrap;
+word-wrap: break-word;
+font-family: ‘Atkinson Hyperlegible’, sans-serif;
+font-size: 0.95rem;
+line-height: 1.55;
+margin: 0;
+color: var(–ink);
+min-height: 50px;
+}
+.preview.empty { font-style: italic; color: var(–muted); }
+
+/* Buttons */
+.btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+font-family: inherit;
+font-size: 1rem;
+font-weight: 700;
+padding: 11px 18px;
+border-radius: var(–radius-sm);
+border: 1.5px solid var(–border-strong);
+background: var(–surface);
+color: var(–ink);
+cursor: pointer;
+margin: 0 6px 6px 0;
+min-height: 46px;
+transition: background 0.15s, border-color 0.15s, transform 0.05s;
+-webkit-tap-highlight-color: transparent;
+}
+.btn:hover {
+background: var(–surface-2);
+border-color: var(–ink-2);
+}
+.btn:active { transform: translateY(1px); }
+.btn.primary {
+background: var(–accent);
+color: #fff;
+border-color: var(–accent);
+box-shadow: var(–shadow-sm);
+font-size: 1.05rem;
+padding: 14px 24px;
+min-height: 52px;
+width: 100%;
+margin-bottom: 10px;
+}
+.btn.primary:hover {
+filter: brightness(1.08);
+}
+@media (prefers-color-scheme: dark) {
+.btn.primary { color: #1a1410; }
+}
+.btn.danger {
+color: var(–warn);
+border-color: var(–warn);
+}
+.btn.danger:hover { background: rgba(168, 66, 58, 0.08); border-color: var(–warn); }
+.btn.small {
+font-size: 0.875rem;
+padding: 8px 14px;
+min-height: 40px;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.file-button {
+display: inline-block;
+cursor: pointer;
+padding: 11px 18px;
+border: 1.5px solid var(–border-strong);
+background: var(–surface);
+border-radius: var(–radius-sm);
+font-weight: 700;
+min-height: 46px;
+}
+.file-button:hover { background: var(–surface-2); }
+input[type=“file”] {
+position: absolute; width: 1px; height: 1px;
+padding: 0; margin: -1px; overflow: hidden;
+clip: rect(0, 0, 0, 0); border: 0;
+}
+#media-preview { margin-top: 14px; }
+#media-preview img, #media-preview video {
+max-width: 100%; height: auto;
+border-radius: var(–radius-sm);
+border: 1px solid var(–border);
+display: block;
+}
+.media-caption {
+margin: 8px 0 0;
+font-size: 0.875rem;
+color: var(–muted);
+}
+
+.inline-save {
+display: flex;
+gap: 8px;
+margin: 14px 0;
+align-items: stretch;
+flex-wrap: wrap;
+}
+.inline-save input[type=“text”] { flex: 1; min-width: 140px; }
+.inline-save .btn { margin: 0; flex-shrink: 0; }
+
+.status {
+margin: 12px 0 0;
+font-size: 0.95rem;
+color: var(–ok);
+font-weight: 700;
+min-height: 1.5em;
+}
+
+ul.saved-list { list-style: none; margin: 0; padding: 0; }
+ul.saved-list li {
+padding: 14px;
+border: 1px solid var(–border);
+border-radius: var(–radius-sm);
+margin-bottom: 8px;
+background: var(–surface-2);
+display: grid;
+grid-template-columns: 1fr;
+gap: 4px 12px;
+}
+ul.saved-list li.empty {
+background: transparent;
+color: var(–muted);
+font-style: italic;
+border-style: dashed;
+text-align: center;
+padding: 18px;
+}
+.saved-title { font-weight: 700; font-size: 1rem; color: var(–ink); }
+.saved-meta { font-size: 0.82rem; color: var(–muted); margin-bottom: 4px; }
+.saved-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.saved-actions .btn { margin: 0; }
+.rename-input { width: 100%; font-size: 1rem; font-weight: 700; }
+
+footer.page {
+margin-top: 36px;
+padding-top: 18px;
+border-top: 1px solid var(–border);
+color: var(–muted);
+font-size: 0.85rem;
+text-align: center;
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>Post Builder<span class="accent-mark">.</span></h1>
+    <div class="title-flourish" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 4.5L13 7l-4.5 1.5L7 13l-1.5-4.5L1 7l4.5-1.5L7 1z" fill="currentColor"/></svg>
+    </div>
+    <p class="subtitle">Compose accessible posts with image descriptions, mentions, and hashtags. Image descriptions become part of the post text itself — not alt text on the image — so they survive sharing across platforms. Share to Facebook (and on to Instagram with cross-posting), or copy and paste anywhere.</p>
+  </header>
+
+  <main>
+    <h2 class="group-heading">Compose</h2>
+
+```
+<div class="section hero">
+  <button class="section-toggle" type="button" aria-expanded="true" aria-controls="caption-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </span>
+      <span class="toggle-text"><span id="caption-summary-text">Post</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="caption-body" class="section-body">
+    <div class="field">
+      <p class="hint">The main body of your post.</p>
+      <textarea id="caption" rows="6" aria-label="Post text"></textarea>
+      <p class="count" id="caption-count" aria-live="polite">0 of 2200 characters</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="mentions-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 006 0v-1a10 10 0 10-3.92 7.94"/></svg>
+      </span>
+      <span class="toggle-text"><span id="mentions-summary-text">Mentions</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="mentions-body" class="section-body" hidden>
+    <div class="field">
+      <p class="hint">One handle per row. The @ is added automatically.</p>
+      <div id="mentions-list"></div>
+      <button id="add-mention-btn" class="btn small" type="button">Add another mention</button>
+      <button id="save-mention-favs-btn" class="btn small" type="button">Save current to favourites</button>
+    </div>
+    <h3>Favourite mentions</h3>
+    <div id="mention-favs" class="chip-list"></div>
+  </div>
+</div>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="hashtags-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+      </span>
+      <span class="toggle-text"><span id="hashtags-summary-text">Hashtags</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="hashtags-body" class="section-body" hidden>
+    <div class="field">
+      <p class="hint">One per line or separated by spaces. The # is added if missing.</p>
+      <textarea id="hashtags" rows="4" aria-label="Hashtags"></textarea>
+      <p class="count" id="hashtags-count" aria-live="polite">0 hashtags</p>
+      <button id="save-hashtag-favs-btn" class="btn small" type="button">Save current to favourites</button>
+    </div>
+    <h3>Favourite hashtags</h3>
+    <div id="hashtag-favs" class="chip-list"></div>
+  </div>
+</div>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="alt-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+      <span class="toggle-text"><span id="alt-summary-text">Image description</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="alt-body" class="section-body" hidden>
+    <div class="field">
+      <p class="hint">Wrapped as "[Image description: ...]" in the output.</p>
+      <textarea id="alt" rows="4" aria-label="Image description"></textarea>
+    </div>
+    <fieldset class="field">
+      <legend>Description position</legend>
+      <label class="radio">
+        <input type="radio" name="position" value="start" checked>
+        <span>At the start of the post</span>
+      </label>
+      <label class="radio">
+        <input type="radio" name="position" value="end">
+        <span>At the end of the post</span>
+      </label>
+    </fieldset>
+  </div>
+</div>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="media-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+      </span>
+      <span class="toggle-text"><span id="media-summary-text">Image or video</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="media-body" class="section-body" hidden>
+    <p class="hint">Optional. Attaching here means it goes through the share sheet with the post.</p>
+    <div class="field">
+      <label for="media" class="file-button">Choose file</label>
+      <input type="file" id="media" accept="image/*,video/*">
+    </div>
+    <div id="media-preview" hidden></div>
+  </div>
+</div>
+
+<h2 class="group-heading">Library</h2>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="templates-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 2,7 12,12 22,7 12,2"/><polyline points="2,17 12,22 22,17"/><polyline points="2,12 12,17 22,12"/></svg>
+      </span>
+      <span class="toggle-text"><span id="templates-summary-text">Templates</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="templates-body" class="section-body" hidden>
+    <p class="hint">Save your current mentions and hashtags as a reusable set.</p>
+    <div class="inline-save">
+      <input type="text" id="template-name" aria-label="Template name" placeholder="Name this template">
+      <button id="save-template-btn" class="btn small" type="button">Save</button>
+    </div>
+    <h3>Your templates</h3>
+    <ul id="templates-list" class="saved-list"></ul>
+  </div>
+</div>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="drafts-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      </span>
+      <span class="toggle-text"><span id="drafts-summary-text">Saved drafts</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="drafts-body" class="section-body" hidden>
+    <ul id="drafts-list" class="saved-list"></ul>
+  </div>
+</div>
+
+<h2 class="group-heading">Preview &amp; Publish</h2>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="preview-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+      </span>
+      <span class="toggle-text"><span id="preview-summary-text">Preview</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="preview-body" class="section-body" hidden>
+    <p class="hint">The combined output that gets copied or shared.</p>
+    <div class="post-card">
+      <div class="post-card-header" aria-hidden="true">
+        <div class="post-card-avatar">P</div>
+        <div class="post-card-meta">
+          <span class="post-card-name">Your post</span>
+          <span class="post-card-time">Preview · now</span>
+        </div>
+      </div>
+      <div class="post-card-body">
+        <pre id="preview" class="preview empty" aria-live="polite">Empty — fill in any field above.</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section hero">
+  <button class="section-toggle" type="button" aria-expanded="true" aria-controls="publish-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9 22,2"/></svg>
+      </span>
+      <span class="toggle-text"><span id="publish-summary-text">Publish</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="publish-body" class="section-body">
+    <p class="hint">Share opens the iOS share sheet — pick Facebook to send the post and any attached image. With Facebook cross-posting on, it carries through to Instagram with the image description intact.</p>
+    <button id="share-btn" class="btn primary" type="button">Share to…</button>
+    <button id="copy-btn" class="btn" type="button">Copy combined post</button>
+    <button id="clear-btn" class="btn danger" type="button">Clear all fields</button>
+    <div class="inline-save">
+      <input type="text" id="draft-name" aria-label="Draft name (optional)" placeholder="Draft name (optional)">
+      <button id="save-btn" class="btn" type="button">Save as draft</button>
+    </div>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </div>
+</div>
+```
+
+  </main>
+
+  <footer class="page">
+    <p>Everything stays on your device. Nothing is uploaded.</p>
+  </footer>
+</div>
+
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+
+  const KEYS = {
+    current: 'captionBuilder.current.v3',
+    drafts: 'captionBuilder.drafts.v3',
+    templates: 'captionBuilder.templates.v3',
+    mentionFavs: 'captionBuilder.mentionFavs.v3',
+    hashtagFavs: 'captionBuilder.hashtagFavs.v3'
+  };
+  const CAPTION_LIMIT = 2200;
+  const HASHTAG_LIMIT = 30;
+  let currentFile = null;
+  let statusTimer;
+
+  function store_get(key) {
+    try { return JSON.parse(localStorage.getItem(KEYS[key]) || 'null'); }
+    catch (e) { return null; }
+  }
+  function store_set(key, val) {
+    try { localStorage.setItem(KEYS[key], JSON.stringify(val)); } catch (e) {}
+  }
+
+  function getCaption() { return $('caption').value; }
+  function getHashtags() { return $('hashtags').value; }
+  function getAlt() { return $('alt').value; }
+  function getPosition() {
+    const r = document.querySelector('input[name="position"]:checked');
+    return r ? r.value : 'start';
+  }
+  function getMentions() {
+    return Array.from(document.querySelectorAll('.mention-input'))
+      .map(i => i.value.trim().replace(/^@+/, ''))
+      .filter(Boolean);
+  }
+
+  function normalizeHashtags(text) {
+    return text.split(/[\s\n,]+/).map(s => s.trim()).filter(Boolean)
+      .map(s => '#' + s.replace(/^#+/, ''));
+  }
+
+  function showStatus(msg) {
+    $('status').textContent = msg;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => { $('status').textContent = ''; }, 4000);
+  }
+
+  function setupSectionToggles() {
+    document.querySelectorAll('.section-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        const targetId = btn.getAttribute('aria-controls');
+        const target = document.getElementById(targetId);
+        if (target) target.hidden = expanded;
+      });
+    });
+  }
+
+  function addMentionRow(value, focus) {
+    const list = $('mentions-list');
+    const row = document.createElement('div');
+    row.className = 'mention-row';
+    const prefix = document.createElement('span');
+    prefix.className = 'at-prefix';
+    prefix.textContent = '@';
+    prefix.setAttribute('aria-hidden', 'true');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'mention-input';
+    input.value = value || '';
+    input.setAttribute('aria-label', 'Mention handle');
+    input.setAttribute('autocapitalize', 'off');
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('spellcheck', 'false');
+    input.addEventListener('input', update);
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'btn small danger';
+    remove.textContent = 'Remove';
+    remove.setAttribute('aria-label', 'Remove this mention row');
+    remove.addEventListener('click', () => {
+      row.remove();
+      if (list.children.length === 0) addMentionRow('', false);
+      update();
+    });
+    row.appendChild(prefix);
+    row.appendChild(input);
+    row.appendChild(remove);
+    list.appendChild(row);
+    if (focus) input.focus();
+  }
+
+  function renderMentions(mentions) {
+    const list = $('mentions-list');
+    list.innerHTML = '';
+    const arr = (mentions && mentions.length) ? mentions : [''];
+    arr.forEach(m => addMentionRow(m, false));
+  }
+
+  function renderMentionFavs() {
+    const favs = store_get('mentionFavs') || [];
+    const container = $('mention-favs');
+    container.innerHTML = '';
+    if (!favs.length) {
+      const p = document.createElement('p');
+      p.className = 'empty-note';
+      p.textContent = 'No favourite mentions yet.';
+      container.appendChild(p);
+      return;
+    }
+    favs.forEach((m, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      const add = document.createElement('button');
+      add.type = 'button'; add.className = 'chip-add';
+      add.textContent = '@' + m;
+      add.setAttribute('aria-label', 'Add mention ' + m + ' to current post');
+      add.addEventListener('click', () => {
+        const existing = getMentions();
+        if (existing.includes(m)) { showStatus('@' + m + ' is already added.'); return; }
+        const inputs = document.querySelectorAll('.mention-input');
+        const empty = Array.from(inputs).find(inp => !inp.value.trim());
+        if (empty) { empty.value = m; }
+        else { addMentionRow(m, false); }
+        update();
+        showStatus('Added @' + m);
+      });
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'chip-remove';
+      del.textContent = '✕';
+      del.setAttribute('aria-label', 'Remove ' + m + ' from favourite mentions');
+      del.addEventListener('click', () => {
+        const f = store_get('mentionFavs') || [];
+        f.splice(i, 1);
+        store_set('mentionFavs', f);
+        renderMentionFavs();
+        showStatus('Removed @' + m + ' from favourites.');
+      });
+      chip.appendChild(add);
+      chip.appendChild(del);
+      container.appendChild(chip);
+    });
+  }
+
+  function saveMentionsToFavs() {
+    const current = getMentions();
+    if (!current.length) { showStatus('No mentions to save.'); return; }
+    const favs = store_get('mentionFavs') || [];
+    let added = 0;
+    current.forEach(m => { if (!favs.includes(m)) { favs.push(m); added++; } });
+    favs.sort((a, b) => a.localeCompare(b));
+    store_set('mentionFavs', favs);
+    renderMentionFavs();
+    showStatus(added ? 'Saved ' + added + ' to favourites.' : 'All already saved.');
+  }
+
+  function renderHashtagFavs() {
+    const favs = store_get('hashtagFavs') || [];
+    const container = $('hashtag-favs');
+    container.innerHTML = '';
+    if (!favs.length) {
+      const p = document.createElement('p');
+      p.className = 'empty-note';
+      p.textContent = 'No favourite hashtags yet.';
+      container.appendChild(p);
+      return;
+    }
+    favs.forEach((t, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      const add = document.createElement('button');
+      add.type = 'button'; add.className = 'chip-add';
+      add.textContent = '#' + t;
+      add.setAttribute('aria-label', 'Add hashtag ' + t + ' to current post');
+      add.addEventListener('click', () => {
+        const ta = $('hashtags');
+        const current = normalizeHashtags(ta.value).map(h => h.slice(1));
+        if (current.includes(t)) { showStatus('#' + t + ' is already added.'); return; }
+        const trimmed = ta.value.replace(/\s+$/, '');
+        ta.value = (trimmed ? trimmed + ' ' : '') + '#' + t;
+        update();
+        showStatus('Added #' + t);
+      });
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'chip-remove';
+      del.textContent = '✕';
+      del.setAttribute('aria-label', 'Remove ' + t + ' from favourite hashtags');
+      del.addEventListener('click', () => {
+        const f = store_get('hashtagFavs') || [];
+        f.splice(i, 1);
+        store_set('hashtagFavs', f);
+        renderHashtagFavs();
+        showStatus('Removed #' + t + ' from favourites.');
+      });
+      chip.appendChild(add);
+      chip.appendChild(del);
+      container.appendChild(chip);
+    });
+  }
+
+  function saveHashtagsToFavs() {
+    const tags = normalizeHashtags(getHashtags()).map(t => t.slice(1));
+    if (!tags.length) { showStatus('No hashtags to save.'); return; }
+    const favs = store_get('hashtagFavs') || [];
+    let added = 0;
+    tags.forEach(t => { if (!favs.includes(t)) { favs.push(t); added++; } });
+    favs.sort((a, b) => a.localeCompare(b));
+    store_set('hashtagFavs', favs);
+    renderHashtagFavs();
+    showStatus(added ? 'Saved ' + added + ' to favourites.' : 'All already saved.');
+  }
+
+  function renderTemplates() {
+    const list = $('templates-list');
+    const templates = store_get('templates') || [];
+    list.innerHTML = '';
+    if (!templates.length) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'No templates saved yet.';
+      list.appendChild(li);
+      return;
+    }
+    templates.forEach((t, i) => buildTemplateRow(list, t, i, false));
+  }
+
+  function buildTemplateRow(list, t, i, renaming) {
+    const li = document.createElement('li');
+    const meta = document.createElement('span');
+    meta.className = 'saved-meta';
+    const bits = [];
+    if (t.mentions && t.mentions.length) bits.push(t.mentions.length + ' mention' + (t.mentions.length === 1 ? '' : 's'));
+    if (t.hashtags) {
+      const c = normalizeHashtags(t.hashtags).length;
+      bits.push(c + ' hashtag' + (c === 1 ? '' : 's'));
+    }
+    meta.textContent = bits.length ? 'Contains: ' + bits.join(', ') : 'Empty';
+
+    const actions = document.createElement('div');
+    actions.className = 'saved-actions';
+
+    if (renaming) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'rename-input';
+      input.value = t.name || '';
+      input.setAttribute('aria-label', 'New name for template');
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+      });
+      const save = document.createElement('button');
+      save.type = 'button'; save.className = 'btn small primary';
+      save.textContent = 'Save name';
+      save.addEventListener('click', commit);
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button'; cancelBtn.className = 'btn small';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', cancel);
+
+      function commit() {
+        const v = input.value.trim();
+        if (!v) { showStatus('Name cannot be empty.'); input.focus(); return; }
+        const templates = store_get('templates') || [];
+        if (templates[i]) {
+          templates[i].name = v;
+          store_set('templates', templates);
+          showStatus('Renamed to: ' + v);
+        }
+        renderTemplates();
+      }
+      function cancel() { renderTemplates(); }
+
+      li.appendChild(input);
+      li.appendChild(meta);
+      actions.appendChild(save);
+      actions.appendChild(cancelBtn);
+      li.appendChild(actions);
+      list.appendChild(li);
+      setTimeout(() => input.focus(), 0);
+      return;
+    }
+
+    const title = document.createElement('span');
+    title.className = 'saved-title';
+    title.textContent = t.name || ('Template ' + (i + 1));
+
+    const apply = document.createElement('button');
+    apply.type = 'button'; apply.className = 'btn small';
+    apply.textContent = 'Apply';
+    apply.setAttribute('aria-label', 'Apply template: ' + title.textContent);
+    apply.addEventListener('click', () => applyTemplate(i));
+
+    const renameBtn = document.createElement('button');
+    renameBtn.type = 'button'; renameBtn.className = 'btn small';
+    renameBtn.textContent = 'Rename';
+    renameBtn.setAttribute('aria-label', 'Rename template: ' + title.textContent);
+    renameBtn.addEventListener('click', () => {
+      list.innerHTML = '';
+      const templates = store_get('templates') || [];
+      templates.forEach((tpl, j) => buildTemplateRow(list, tpl, j, j === i));
+    });
+
+    const del = document.createElement('button');
+    del.type = 'button'; del.className = 'btn small danger';
+    del.textContent = 'Delete';
+    del.setAttribute('aria-label', 'Delete template: ' + title.textContent);
+    del.addEventListener('click', () => deleteTemplate(i));
+
+    li.appendChild(title);
+    li.appendChild(meta);
+    actions.appendChild(apply);
+    actions.appendChild(renameBtn);
+    actions.appendChild(del);
+    li.appendChild(actions);
+    list.appendChild(li);
+  }
+
+  function saveTemplate() {
+    if (!getMentions().length && !getHashtags().trim()) {
+      showStatus('Add some mentions or hashtags first.');
+      return;
+    }
+    const nameInput = $('template-name');
+    const name = nameInput.value.trim();
+    if (!name) {
+      showStatus('Enter a name for the template first.');
+      nameInput.focus();
+      return;
+    }
+    const templates = store_get('templates') || [];
+    templates.unshift({
+      name: name,
+      mentions: getMentions(),
+      hashtags: getHashtags(),
+      savedAt: Date.now()
+    });
+    store_set('templates', templates);
+    nameInput.value = '';
+    renderTemplates();
+    update();
+    showStatus('Template saved: ' + name);
+  }
+
+  function applyTemplate(i) {
+    const templates = store_get('templates') || [];
+    const t = templates[i];
+    if (!t) return;
+    const hasContent = getMentions().length || getHashtags().trim();
+    if (hasContent && !confirm('Apply this template? Your current mentions and hashtags will be replaced. The post text and image description will be kept.')) return;
+    $('hashtags').value = t.hashtags || '';
+    renderMentions(t.mentions || []);
+    update();
+    showStatus('Applied template: ' + (t.name || ('Template ' + (i + 1))));
+  }
+
+  function deleteTemplate(i) {
+    const templates = store_get('templates') || [];
+    const name = templates[i] ? (templates[i].name || ('Template ' + (i + 1))) : '';
+    if (!confirm('Delete template "' + name + '"?')) return;
+    templates.splice(i, 1);
+    store_set('templates', templates);
+    renderTemplates();
+    update();
+    showStatus('Template deleted.');
+  }
+
+  function renderDrafts() {
+    const list = $('drafts-list');
+    const drafts = store_get('drafts') || [];
+    list.innerHTML = '';
+    if (!drafts.length) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'No drafts saved yet.';
+      list.appendChild(li);
+      return;
+    }
+    drafts.forEach((d, i) => buildDraftRow(list, d, i, false));
+  }
+
+  function buildDraftRow(list, d, i, renaming) {
+    const li = document.createElement('li');
+    const meta = document.createElement('span');
+    meta.className = 'saved-meta';
+    meta.textContent = 'Saved ' + new Date(d.savedAt).toLocaleString();
+    const actions = document.createElement('div');
+    actions.className = 'saved-actions';
+
+    if (renaming) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'rename-input';
+      input.value = d.name || '';
+      input.setAttribute('aria-label', 'New name for draft');
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+      });
+      const save = document.createElement('button');
+      save.type = 'button'; save.className = 'btn small primary';
+      save.textContent = 'Save name';
+      save.addEventListener('click', commit);
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button'; cancelBtn.className = 'btn small';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', cancel);
+
+      function commit() {
+        const v = input.value.trim();
+        const drafts = store_get('drafts') || [];
+        if (drafts[i]) {
+          drafts[i].name = v || ('Draft ' + (i + 1));
+          store_set('drafts', drafts);
+          showStatus('Renamed.');
+        }
+        renderDrafts();
+      }
+      function cancel() { renderDrafts(); }
+
+      li.appendChild(input);
+      li.appendChild(meta);
+      actions.appendChild(save);
+      actions.appendChild(cancelBtn);
+      li.appendChild(actions);
+      list.appendChild(li);
+      setTimeout(() => input.focus(), 0);
+      return;
+    }
+
+    const title = document.createElement('span');
+    title.className = 'saved-title';
+    title.textContent = d.name || ('Draft ' + (i + 1));
+
+    const loadBtn = document.createElement('button');
+    loadBtn.type = 'button'; loadBtn.className = 'btn small';
+    loadBtn.textContent = 'Load';
+    loadBtn.setAttribute('aria-label', 'Load draft: ' + title.textContent);
+    loadBtn.addEventListener('click', () => loadDraft(i));
+
+    const renameBtn = document.createElement('button');
+    renameBtn.type = 'button'; renameBtn.className = 'btn small';
+    renameBtn.textContent = 'Rename';
+    renameBtn.setAttribute('aria-label', 'Rename draft: ' + title.textContent);
+    renameBtn.addEventListener('click', () => {
+      list.innerHTML = '';
+      const drafts = store_get('drafts') || [];
+      drafts.forEach((dr, j) => buildDraftRow(list, dr, j, j === i));
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button'; delBtn.className = 'btn small danger';
+    delBtn.textContent = 'Delete';
+    delBtn.setAttribute('aria-label', 'Delete draft: ' + title.textContent);
+    delBtn.addEventListener('click', () => deleteDraft(i));
+
+    li.appendChild(title);
+    li.appendChild(meta);
+    actions.appendChild(loadBtn);
+    actions.appendChild(renameBtn);
+    actions.appendChild(delBtn);
+    li.appendChild(actions);
+    list.appendChild(li);
+  }
+
+  function saveDraft() {
+    if (!getCaption().trim() && !getMentions().length && !getHashtags().trim() && !getAlt().trim()) {
+      showStatus('Nothing to save yet.');
+      return;
+    }
+    const nameInput = $('draft-name');
+    const name = nameInput.value.trim() || ('Draft ' + new Date().toLocaleString());
+    const drafts = store_get('drafts') || [];
+    drafts.unshift({
+      name: name,
+      caption: getCaption(),
+      mentions: getMentions(),
+      hashtags: getHashtags(),
+      alt: getAlt(),
+      position: getPosition(),
+      savedAt: Date.now()
+    });
+    store_set('drafts', drafts);
+    nameInput.value = '';
+    renderDrafts();
+    update();
+    showStatus('Draft saved: ' + name);
+  }
+
+  function loadDraft(i) {
+    const drafts = store_get('drafts') || [];
+    const d = drafts[i];
+    if (!d) return;
+    $('caption').value = d.caption || '';
+    $('hashtags').value = d.hashtags || '';
+    $('alt').value = d.alt || '';
+    renderMentions(d.mentions || []);
+    const r = document.querySelector('input[name="position"][value="' + (d.position || 'start') + '"]');
+    if (r) r.checked = true;
+    update();
+    showStatus('Loaded draft: ' + (d.name || ('Draft ' + (i + 1))));
+  }
+
+  function deleteDraft(i) {
+    if (!confirm('Delete this draft?')) return;
+    const drafts = store_get('drafts') || [];
+    drafts.splice(i, 1);
+    store_set('drafts', drafts);
+    renderDrafts();
+    showStatus('Draft deleted.');
+  }
+
+  function buildOutput() {
+    const caption = getCaption().trim();
+    const mentions = getMentions().map(m => '@' + m).join(' ');
+    const hashtags = normalizeHashtags(getHashtags()).join(' ');
+    const alt = getAlt().trim();
+    const descBlock = alt ? '[Image description: ' + alt + ']' : '';
+    const body = [caption, mentions].filter(Boolean).join('\n\n');
+    const position = getPosition();
+    const parts = [];
+    if (position === 'start' && descBlock) parts.push(descBlock);
+    if (body) parts.push(body);
+    if (hashtags) parts.push(hashtags);
+    if (position === 'end' && descBlock) parts.push(descBlock);
+    return parts.join('\n\n');
+  }
+
+  function updateSummaries() {
+    const cap = getCaption();
+    const mc = getMentions().length;
+    const tags = normalizeHashtags(getHashtags()).length;
+    const alt = getAlt();
+    const templates = (store_get('templates') || []).length;
+    const drafts = (store_get('drafts') || []).length;
+
+    function setSum(id, base, extra) {
+      const el = $(id);
+      const parent = el.parentElement;
+      el.textContent = base;
+      const existing = parent.querySelector('.summary-count');
+      if (existing) existing.remove();
+      if (extra) {
+        const span = document.createElement('span');
+        span.className = 'summary-count';
+        span.textContent = extra;
+        parent.appendChild(span);
+      }
+    }
+    setSum('caption-summary-text', 'Post', cap ? cap.length + ' chars' : '');
+    setSum('mentions-summary-text', 'Mentions', mc ? String(mc) : '');
+    setSum('hashtags-summary-text', 'Hashtags', tags ? tags + (tags > HASHTAG_LIMIT ? ' (over)' : '') : '');
+    setSum('alt-summary-text', 'Image description', alt ? 'filled' : '');
+    setSum('media-summary-text', 'Image or video', currentFile ? 'attached' : '');
+    setSum('templates-summary-text', 'Templates', templates ? templates + ' saved' : '');
+    setSum('drafts-summary-text', 'Saved drafts', drafts ? drafts + ' saved' : '');
+  }
+
+  function update() {
+    const output = buildOutput();
+    const preview = $('preview');
+    if (output) {
+      preview.textContent = output;
+      preview.classList.remove('empty');
+    } else {
+      preview.textContent = 'Empty — fill in any field above.';
+      preview.classList.add('empty');
+    }
+
+    const capLen = getCaption().length;
+    $('caption-count').textContent = capLen + ' of ' + CAPTION_LIMIT + ' characters';
+    $('caption-count').classList.toggle('over', capLen > CAPTION_LIMIT);
+
+    const tagCount = normalizeHashtags(getHashtags()).length;
+    $('hashtags-count').textContent = tagCount + ' hashtag' + (tagCount === 1 ? '' : 's')
+      + (tagCount > HASHTAG_LIMIT ? ' (Instagram limit is 30)' : '');
+    $('hashtags-count').classList.toggle('over', tagCount > HASHTAG_LIMIT);
+
+    updateSummaries();
+    saveCurrent();
+  }
+
+  function saveCurrent() {
+    store_set('current', {
+      caption: getCaption(),
+      mentions: getMentions(),
+      hashtags: getHashtags(),
+      alt: getAlt(),
+      position: getPosition()
+    });
+  }
+
+  function loadCurrent() {
+    const s = store_get('current');
+    if (!s) { renderMentions([]); return; }
+    $('caption').value = s.caption || '';
+    $('hashtags').value = s.hashtags || '';
+    $('alt').value = s.alt || '';
+    renderMentions(s.mentions || []);
+    const r = document.querySelector('input[name="position"][value="' + (s.position || 'start') + '"]');
+    if (r) r.checked = true;
+  }
+
+  async function shareOutput() {
+    const text = buildOutput();
+    if (!text && !currentFile) { showStatus('Nothing to share yet.'); return; }
+    if (!navigator.share) {
+      showStatus('Share sheet not supported here. Use Copy instead.');
+      return;
+    }
+    const data = {};
+    if (text) data.text = text;
+    if (currentFile && navigator.canShare && navigator.canShare({ files: [currentFile] })) {
+      data.files = [currentFile];
+    }
+    try {
+      await navigator.share(data);
+      showStatus('Shared.');
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      showStatus('Share failed: ' + (e && e.message ? e.message : 'unknown error'));
+    }
+  }
+
+  async function copyOutput() {
+    const text = buildOutput();
+    if (!text) { showStatus('Nothing to copy yet.'); return; }
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus('Copied to clipboard.');
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); showStatus('Copied to clipboard.'); }
+      catch (err) { showStatus('Could not copy. Select the preview text manually.'); }
+      document.body.removeChild(ta);
+    }
+  }
+
+  function clearAll() {
+    if (!confirm('Clear all fields? Your drafts, templates and favourites will be kept.')) return;
+    $('caption').value = '';
+    $('hashtags').value = '';
+    $('alt').value = '';
+    renderMentions([]);
+    const startRadio = document.querySelector('input[name="position"][value="start"]');
+    if (startRadio) startRadio.checked = true;
+    $('media-preview').hidden = true;
+    $('media-preview').innerHTML = '';
+    $('media').value = '';
+    currentFile = null;
+    update();
+    showStatus('Cleared.');
+  }
+
+  function handleMedia(e) {
+    const file = e.target.files && e.target.files[0];
+    $('media-preview').innerHTML = '';
+    currentFile = file || null;
+    if (!file) { $('media-preview').hidden = true; updateSummaries(); return; }
+    const url = URL.createObjectURL(file);
+    if (file.type.indexOf('image/') === 0) {
+      const img = document.createElement('img');
+      img.src = url; img.alt = 'Preview of ' + file.name;
+      $('media-preview').appendChild(img);
+    } else if (file.type.indexOf('video/') === 0) {
+      const v = document.createElement('video');
+      v.src = url; v.controls = true;
+      $('media-preview').appendChild(v);
+    }
+    const cap = document.createElement('p');
+    cap.className = 'media-caption'; cap.textContent = file.name;
+    $('media-preview').appendChild(cap);
+    $('media-preview').hidden = false;
+    updateSummaries();
+  }
+
+  setupSectionToggles();
+  ['caption', 'hashtags', 'alt'].forEach(id => {
+    $(id).addEventListener('input', update);
+  });
+  document.querySelectorAll('input[name="position"]').forEach(r => r.addEventListener('change', update));
+  $('add-mention-btn').addEventListener('click', () => { addMentionRow('', true); update(); });
+  $('save-mention-favs-btn').addEventListener('click', saveMentionsToFavs);
+  $('save-hashtag-favs-btn').addEventListener('click', saveHashtagsToFavs);
+  $('save-template-btn').addEventListener('click', saveTemplate);
+  $('template-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); saveTemplate(); }
+  });
+  $('draft-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); saveDraft(); }
+  });
+  $('share-btn').addEventListener('click', shareOutput);
+  $('copy-btn').addEventListener('click', copyOutput);
+  $('save-btn').addEventListener('click', saveDraft);
+  $('clear-btn').addEventListener('click', clearAll);
+  $('media').addEventListener('change', handleMedia);
+
+  if (!navigator.share) {
+    $('share-btn').disabled = true;
+    $('share-btn').setAttribute('aria-label', 'Share to (not supported in this browser)');
+  }
+
+  loadCurrent();
+  renderMentionFavs();
+  renderHashtagFavs();
+  renderTemplates();
+  renderDrafts();
+  update();
+})();
+</script>
+
+</body>
+</html>
