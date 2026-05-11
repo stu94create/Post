@@ -592,14 +592,23 @@ padding: 0; margin: -1px; overflow: hidden;
 clip: rect(0, 0, 0, 0); border: 0;
 }
 #media-preview { margin-top: 14px; display: flex; flex-direction: column; gap: 14px; }
-#media-preview .media-item { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
-#media-preview .media-item img, #media-preview .media-item video { align-self: stretch; }
+#media-preview .media-item { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
 #media-preview img, #media-preview video {
-max-width: 100%; height: auto;
+max-width: 100%;
+max-height: 140px;
+height: auto;
+width: auto;
 border-radius: var(--radius-sm);
 border: 1px solid var(--border);
 display: block;
 }
+#media-preview .media-actions {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-top: 2px;
+}
+#media-preview .media-actions .btn { margin: 0; }
 .media-caption {
 margin: 8px 0 0;
 font-size: 0.875rem;
@@ -1681,13 +1690,25 @@ text-align: center;
       const cap = document.createElement('p');
       cap.className = 'media-caption'; cap.textContent = file.name;
       item.appendChild(cap);
+      const actions = document.createElement('div');
+      actions.className = 'media-actions';
+      if (file.type.indexOf('image/') === 0 && navigator.share) {
+        const describeBtn = document.createElement('button');
+        describeBtn.type = 'button';
+        describeBtn.className = 'btn small';
+        describeBtn.textContent = 'Get a description…';
+        describeBtn.setAttribute('aria-label', 'Send ' + file.name + ' to another app to get a description');
+        describeBtn.addEventListener('click', () => describePhoto(idx));
+        actions.appendChild(describeBtn);
+      }
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'btn small danger';
       removeBtn.textContent = 'Remove';
       removeBtn.setAttribute('aria-label', 'Remove ' + file.name);
       removeBtn.addEventListener('click', () => removePhoto(idx));
-      item.appendChild(removeBtn);
+      actions.appendChild(removeBtn);
+      item.appendChild(actions);
       preview.appendChild(item);
     });
     preview.hidden = false;
@@ -1701,11 +1722,25 @@ text-align: center;
     if (currentMediaUrls[idx]) URL.revokeObjectURL(currentMediaUrls[idx]);
     currentFiles.splice(idx, 1);
     currentMediaUrls.splice(idx, 1);
-    $('media').value = '';
     renderMediaPreview();
     renderAltFields([]);
     update();
     showStatus('Removed ' + file.name);
+  }
+
+  async function describePhoto(idx) {
+    const file = currentFiles[idx];
+    if (!file) return;
+    if (!navigator.share || !navigator.canShare || !navigator.canShare({ files: [file] })) {
+      showStatus('Share sheet not supported here.');
+      return;
+    }
+    try {
+      await navigator.share({ files: [file] });
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      showStatus('Share failed: ' + (e && e.message ? e.message : 'unknown error'));
+    }
   }
 
   function handleMedia(e) {
