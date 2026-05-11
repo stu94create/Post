@@ -3,8 +3,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Post Builder</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Post Builder">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#b04a2e" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14110d" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -35,39 +41,39 @@
 
 @media (prefers-color-scheme: dark) {
 :root {
-–bg: #14110d;
-–bg-2: #0c0a08;
-–surface: #1f1a14;
-–surface-2: #271f17;
-–surface-3: #2f261c;
-–surface-hero: #2a1f15;
-–border: #3a3024;
-–border-strong: #5a4a37;
-–ink: #f4ecd9;
-–ink-2: #d8cdb8;
-–muted: #a89980;
-–accent: #e08160;
-–accent-2: #f0a37b;
-–accent-soft: #3d2620;
-–warn: #e8826f;
-–ok: #a8c890;
-–shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-–shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.4);
+--bg: #14110d;
+--bg-2: #0c0a08;
+--surface: #1f1a14;
+--surface-2: #271f17;
+--surface-3: #2f261c;
+--surface-hero: #2a1f15;
+--border: #3a3024;
+--border-strong: #5a4a37;
+--ink: #f4ecd9;
+--ink-2: #d8cdb8;
+--muted: #a89980;
+--accent: #e08160;
+--accent-2: #f0a37b;
+--accent-soft: #3d2620;
+--warn: #e8826f;
+--ok: #a8c890;
+--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+--shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.4);
 }
 }
 
-- { box-sizing: border-box; }
+* { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
 
 body {
 margin: 0;
-background: var(–bg);
+background: var(--bg);
 background-image:
-radial-gradient(circle at 12% 8%, var(–accent-soft) 0%, transparent 38%),
-radial-gradient(circle at 88% 92%, var(–bg-2) 0%, transparent 50%);
+radial-gradient(circle at 12% 8%, var(--accent-soft) 0%, transparent 38%),
+radial-gradient(circle at 88% 92%, var(--bg-2) 0%, transparent 50%);
 background-attachment: fixed;
-color: var(–ink);
-font-family: ‘Atkinson Hyperlegible’, sans-serif;
+color: var(--ink);
+font-family: 'Atkinson Hyperlegible', sans-serif;
 font-size: 17px;
 line-height: 1.55;
 -webkit-font-smoothing: antialiased;
@@ -81,38 +87,38 @@ padding: 12px 0 28px;
 margin-bottom: 24px;
 }
 h1 {
-font-family: ‘EB Garamond’, serif;
+font-family: 'EB Garamond', serif;
 font-weight: 600;
 font-size: 2.85rem;
 line-height: 1;
 margin: 0;
 letter-spacing: -0.025em;
-color: var(–ink);
+color: var(--ink);
 }
-h1 .accent-mark { color: var(–accent); margin-left: 2px; }
+h1 .accent-mark { color: var(--accent); margin-left: 2px; }
 .title-flourish {
 display: flex;
 align-items: center;
 gap: 10px;
 margin: 16px 0 0;
-color: var(–accent);
+color: var(--accent);
 }
 .title-flourish::before {
-content: ‘’;
+content: '';
 flex: 0 0 32px;
 height: 1.5px;
-background: var(–accent);
+background: var(--accent);
 border-radius: 2px;
 }
 .title-flourish::after {
-content: ‘’;
+content: '';
 flex: 1;
 height: 1px;
-background: var(–border);
+background: var(--border);
 }
 .subtitle {
 margin: 16px 0 0;
-color: var(–muted);
+color: var(--muted);
 font-size: 0.95rem;
 max-width: 56ch;
 line-height: 1.5;
@@ -120,10 +126,10 @@ line-height: 1.5;
 
 /* Group headings (h2) */
 h2.group-heading {
-font-family: ‘EB Garamond’, serif;
+font-family: 'EB Garamond', serif;
 font-weight: 500;
 font-style: italic;
-color: var(–muted);
+color: var(--muted);
 font-size: 1.05rem;
 margin: 30px 4px 12px;
 letter-spacing: 0.01em;
@@ -132,33 +138,33 @@ align-items: center;
 gap: 12px;
 }
 h2.group-heading::after {
-content: ‘’;
+content: '';
 flex: 1;
 height: 1px;
-background: var(–border);
+background: var(--border);
 }
 h2.group-heading:first-of-type { margin-top: 0; }
 
 /* Section cards */
 .section {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: var(–radius);
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: var(--radius);
 margin-bottom: 10px;
-box-shadow: var(–shadow-sm);
+box-shadow: var(--shadow-sm);
 overflow: hidden;
 transition: box-shadow 0.2s, border-color 0.15s;
 }
-.section:has(.section-toggle[aria-expanded=“true”]) {
-box-shadow: var(–shadow);
-border-color: var(–border-strong);
+.section:has(.section-toggle[aria-expanded="true"]) {
+box-shadow: var(--shadow);
+border-color: var(--border-strong);
 }
 
 .section.hero {
-background: var(–surface-hero);
-border: 1.5px solid var(–border-strong);
-border-radius: var(–radius-lg);
-box-shadow: var(–shadow);
+background: var(--surface-hero);
+border: 1.5px solid var(--border-strong);
+border-radius: var(--radius-lg);
+box-shadow: var(--shadow);
 margin-bottom: 14px;
 }
 .section.hero .section-toggle {
@@ -168,21 +174,21 @@ min-height: 68px;
 font-size: 1.5rem;
 }
 .section.hero .section-toggle:hover { background: rgba(176, 74, 46, 0.04); }
-.section.hero .section-toggle[aria-expanded=“true”] { background: transparent; }
+.section.hero .section-toggle[aria-expanded="true"] { background: transparent; }
 .section.hero .section-body { padding: 4px 22px 24px; }
 .section.hero .section-icon-glyph {
-background: var(–accent);
-color: var(–surface-hero);
+background: var(--accent);
+color: var(--surface-hero);
 }
 @media (prefers-color-scheme: dark) {
-.section.hero .section-icon-glyph { color: var(–surface-hero); }
+.section.hero .section-icon-glyph { color: var(--surface-hero); }
 }
 
 .section-toggle {
 width: 100%;
 cursor: pointer;
 padding: 16px 18px;
-font-family: ‘EB Garamond’, serif;
+font-family: 'EB Garamond', serif;
 font-weight: 600;
 font-size: 1.25rem;
 min-height: 60px;
@@ -191,22 +197,22 @@ align-items: center;
 justify-content: space-between;
 gap: 12px;
 user-select: none;
-background: var(–surface);
+background: var(--surface);
 border: 0;
-color: var(–ink);
+color: var(--ink);
 text-align: left;
 margin: 0;
 -webkit-tap-highlight-color: transparent;
 }
-.section-toggle:hover { background: var(–surface-2); }
-.section-toggle[aria-expanded=“true”] {
-border-bottom: 1px solid var(–border);
-background: var(–surface-2);
+.section-toggle:hover { background: var(--surface-2); }
+.section-toggle[aria-expanded="true"] {
+border-bottom: 1px solid var(--border);
+background: var(--surface-2);
 }
 .section-toggle:focus-visible {
-outline: 3px solid var(–accent-2);
+outline: 3px solid var(--accent-2);
 outline-offset: -3px;
-border-radius: var(–radius);
+border-radius: var(--radius);
 }
 .toggle-content {
 flex: 1;
@@ -220,8 +226,8 @@ flex-shrink: 0;
 width: 32px;
 height: 32px;
 border-radius: 8px;
-background: var(–accent-soft);
-color: var(–accent);
+background: var(--accent-soft);
+color: var(--accent);
 display: flex;
 align-items: center;
 justify-content: center;
@@ -229,24 +235,24 @@ justify-content: center;
 .section-icon-glyph svg { display: block; }
 .toggle-text { min-width: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .summary-count {
-color: var(–accent);
+color: var(--accent);
 font-weight: 700;
 font-size: 0.78rem;
-font-family: ‘Atkinson Hyperlegible’, sans-serif;
+font-family: 'Atkinson Hyperlegible', sans-serif;
 padding: 2px 9px;
-background: var(–accent-soft);
+background: var(--accent-soft);
 border-radius: 12px;
 letter-spacing: 0.02em;
 }
 .section-chevron {
 flex-shrink: 0;
-color: var(–muted);
+color: var(--muted);
 transition: transform 0.2s ease-out;
 display: block;
 }
-.section-toggle[aria-expanded=“true”] .section-chevron {
+.section-toggle[aria-expanded="true"] .section-chevron {
 transform: rotate(180deg);
-color: var(–accent);
+color: var(--accent);
 }
 
 .section-body { padding: 4px 20px 22px; }
@@ -254,11 +260,11 @@ color: var(–accent);
 .section-body > p.hint:first-child { margin-top: 14px; }
 
 h3 {
-font-family: ‘EB Garamond’, serif;
+font-family: 'EB Garamond', serif;
 font-weight: 600;
 font-size: 1.1rem;
 margin: 22px 0 10px;
-color: var(–ink-2);
+color: var(--ink-2);
 letter-spacing: -0.005em;
 }
 
@@ -266,40 +272,40 @@ letter-spacing: -0.005em;
 .field:last-child { margin-bottom: 0; }
 .hint {
 margin: 0 0 10px;
-color: var(–muted);
+color: var(--muted);
 font-size: 0.875rem;
 font-style: italic;
 line-height: 1.45;
 }
 
-textarea, input[type=“text”] {
+textarea, input[type="text"] {
 width: 100%;
-font-family: ‘Atkinson Hyperlegible’, sans-serif;
+font-family: 'Atkinson Hyperlegible', sans-serif;
 font-size: 1rem;
 line-height: 1.5;
 padding: 12px 14px;
-border: 1.5px solid var(–border-strong);
-border-radius: var(–radius-sm);
-background: var(–surface);
-color: var(–ink);
+border: 1.5px solid var(--border-strong);
+border-radius: var(--radius-sm);
+background: var(--surface);
+color: var(--ink);
 min-height: 48px;
 transition: border-color 0.15s, box-shadow 0.15s;
 }
 textarea { min-height: 110px; resize: vertical; }
-textarea:hover, input[type=“text”]:hover { border-color: var(–ink-2); }
-textarea:focus, input[type=“text”]:focus,
+textarea:hover, input[type="text"]:hover { border-color: var(--ink-2); }
+textarea:focus, input[type="text"]:focus,
 button:focus-visible, label.file-button:focus-within {
-outline: 3px solid var(–accent-2);
+outline: 3px solid var(--accent-2);
 outline-offset: 2px;
 }
-textarea:focus, input[type=“text”]:focus {
-border-color: var(–accent);
+textarea:focus, input[type="text"]:focus {
+border-color: var(--accent);
 outline-offset: -1px;
 }
 
 fieldset {
-border: 1.5px solid var(–border);
-border-radius: var(–radius-sm);
+border: 1.5px solid var(--border);
+border-radius: var(--radius-sm);
 padding: 14px 16px 16px;
 margin: 0;
 }
@@ -315,20 +321,20 @@ min-height: 36px;
 padding: 4px 0;
 }
 .radio:last-child { margin-bottom: 0; }
-.radio input[type=“radio”] {
+.radio input[type="radio"] {
 width: 22px; height: 22px;
-accent-color: var(–accent);
+accent-color: var(--accent);
 flex-shrink: 0;
 }
 
 .count {
 margin-top: 8px;
 font-size: 0.8rem;
-color: var(–muted);
+color: var(--muted);
 text-align: right;
-font-feature-settings: ‘tnum’;
+font-feature-settings: 'tnum';
 }
-.count.over { color: var(–warn); font-weight: 700; }
+.count.over { color: var(--warn); font-weight: 700; }
 
 .mention-row {
 display: flex;
@@ -337,7 +343,7 @@ margin-bottom: 8px;
 align-items: center;
 }
 .mention-row .at-prefix {
-color: var(–accent);
+color: var(--accent);
 font-weight: 700;
 font-size: 1.05rem;
 flex-shrink: 0;
@@ -356,28 +362,28 @@ margin-top: 4px;
 .chip {
 display: inline-flex;
 align-items: stretch;
-background: var(–accent-soft);
-border: 1px solid var(–border-strong);
+background: var(--accent-soft);
+border: 1px solid var(--border-strong);
 border-radius: 22px;
 overflow: hidden;
 }
-.chip:hover { box-shadow: var(–shadow-sm); }
+.chip:hover { box-shadow: var(--shadow-sm); }
 .chip-add, .chip-remove {
 background: none;
 border: 0;
 font-family: inherit;
 cursor: pointer;
-color: var(–ink);
+color: var(--ink);
 min-height: 42px;
 font-size: 0.92rem;
 -webkit-tap-highlight-color: transparent;
 }
-.chip-add { padding: 8px 14px; font-weight: 700; color: var(–accent); }
+.chip-add { padding: 8px 14px; font-weight: 700; color: var(--accent); }
 .chip-add:hover { background: rgba(176, 74, 46, 0.08); }
 .chip-remove {
 padding: 8px 11px;
-border-left: 1px solid var(–border-strong);
-color: var(–warn);
+border-left: 1px solid var(--border-strong);
+color: var(--warn);
 font-weight: 700;
 min-width: 40px;
 font-size: 1rem;
@@ -385,7 +391,7 @@ font-size: 1rem;
 .chip-remove:hover { background: rgba(168, 66, 58, 0.1); }
 
 .empty-note {
-color: var(–muted);
+color: var(--muted);
 font-style: italic;
 font-size: 0.9rem;
 margin: 8px 0 0;
@@ -393,9 +399,9 @@ margin: 8px 0 0;
 
 /* Preview post card (inside Preview section) */
 .post-card {
-background: var(–surface-2);
-border: 1px solid var(–border);
-border-radius: var(–radius);
+background: var(--surface-2);
+border: 1px solid var(--border);
+border-radius: var(--radius);
 overflow: hidden;
 margin-top: 14px;
 }
@@ -404,20 +410,20 @@ display: flex;
 align-items: center;
 gap: 10px;
 padding: 12px 16px;
-border-bottom: 1px solid var(–border);
-background: var(–surface);
+border-bottom: 1px solid var(--border);
+background: var(--surface);
 }
 .post-card-avatar {
 width: 32px;
 height: 32px;
 border-radius: 50%;
-background: linear-gradient(135deg, var(–accent) 0%, var(–accent-2) 100%);
+background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
 flex-shrink: 0;
 display: flex;
 align-items: center;
 justify-content: center;
 color: #fff;
-font-family: ‘EB Garamond’, serif;
+font-family: 'EB Garamond', serif;
 font-weight: 600;
 font-size: 1rem;
 }
@@ -430,20 +436,20 @@ flex-direction: column;
 line-height: 1.2;
 min-width: 0;
 }
-.post-card-name { font-weight: 700; font-size: 0.92rem; color: var(–ink); }
-.post-card-time { font-size: 0.76rem; color: var(–muted); margin-top: 2px; }
+.post-card-name { font-weight: 700; font-size: 0.92rem; color: var(--ink); }
+.post-card-time { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
 .post-card-body { padding: 14px 16px 16px; }
 .preview {
 white-space: pre-wrap;
 word-wrap: break-word;
-font-family: ‘Atkinson Hyperlegible’, sans-serif;
+font-family: 'Atkinson Hyperlegible', sans-serif;
 font-size: 0.95rem;
 line-height: 1.55;
 margin: 0;
-color: var(–ink);
+color: var(--ink);
 min-height: 50px;
 }
-.preview.empty { font-style: italic; color: var(–muted); }
+.preview.empty { font-style: italic; color: var(--muted); }
 
 /* Buttons */
 .btn {
@@ -454,10 +460,10 @@ font-family: inherit;
 font-size: 1rem;
 font-weight: 700;
 padding: 11px 18px;
-border-radius: var(–radius-sm);
-border: 1.5px solid var(–border-strong);
-background: var(–surface);
-color: var(–ink);
+border-radius: var(--radius-sm);
+border: 1.5px solid var(--border-strong);
+background: var(--surface);
+color: var(--ink);
 cursor: pointer;
 margin: 0 6px 6px 0;
 min-height: 46px;
@@ -465,15 +471,15 @@ transition: background 0.15s, border-color 0.15s, transform 0.05s;
 -webkit-tap-highlight-color: transparent;
 }
 .btn:hover {
-background: var(–surface-2);
-border-color: var(–ink-2);
+background: var(--surface-2);
+border-color: var(--ink-2);
 }
 .btn:active { transform: translateY(1px); }
 .btn.primary {
-background: var(–accent);
+background: var(--accent);
 color: #fff;
-border-color: var(–accent);
-box-shadow: var(–shadow-sm);
+border-color: var(--accent);
+box-shadow: var(--shadow-sm);
 font-size: 1.05rem;
 padding: 14px 24px;
 min-height: 52px;
@@ -487,10 +493,10 @@ filter: brightness(1.08);
 .btn.primary { color: #1a1410; }
 }
 .btn.danger {
-color: var(–warn);
-border-color: var(–warn);
+color: var(--warn);
+border-color: var(--warn);
 }
-.btn.danger:hover { background: rgba(168, 66, 58, 0.08); border-color: var(–warn); }
+.btn.danger:hover { background: rgba(168, 66, 58, 0.08); border-color: var(--warn); }
 .btn.small {
 font-size: 0.875rem;
 padding: 8px 14px;
@@ -502,14 +508,14 @@ min-height: 40px;
 display: inline-block;
 cursor: pointer;
 padding: 11px 18px;
-border: 1.5px solid var(–border-strong);
-background: var(–surface);
-border-radius: var(–radius-sm);
+border: 1.5px solid var(--border-strong);
+background: var(--surface);
+border-radius: var(--radius-sm);
 font-weight: 700;
 min-height: 46px;
 }
-.file-button:hover { background: var(–surface-2); }
-input[type=“file”] {
+.file-button:hover { background: var(--surface-2); }
+input[type="file"] {
 position: absolute; width: 1px; height: 1px;
 padding: 0; margin: -1px; overflow: hidden;
 clip: rect(0, 0, 0, 0); border: 0;
@@ -517,14 +523,14 @@ clip: rect(0, 0, 0, 0); border: 0;
 #media-preview { margin-top: 14px; }
 #media-preview img, #media-preview video {
 max-width: 100%; height: auto;
-border-radius: var(–radius-sm);
-border: 1px solid var(–border);
+border-radius: var(--radius-sm);
+border: 1px solid var(--border);
 display: block;
 }
 .media-caption {
 margin: 8px 0 0;
 font-size: 0.875rem;
-color: var(–muted);
+color: var(--muted);
 }
 
 .inline-save {
@@ -534,13 +540,13 @@ margin: 14px 0;
 align-items: stretch;
 flex-wrap: wrap;
 }
-.inline-save input[type=“text”] { flex: 1; min-width: 140px; }
+.inline-save input[type="text"] { flex: 1; min-width: 140px; }
 .inline-save .btn { margin: 0; flex-shrink: 0; }
 
 .status {
 margin: 12px 0 0;
 font-size: 0.95rem;
-color: var(–ok);
+color: var(--ok);
 font-weight: 700;
 min-height: 1.5em;
 }
@@ -548,24 +554,24 @@ min-height: 1.5em;
 ul.saved-list { list-style: none; margin: 0; padding: 0; }
 ul.saved-list li {
 padding: 14px;
-border: 1px solid var(–border);
-border-radius: var(–radius-sm);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
 margin-bottom: 8px;
-background: var(–surface-2);
+background: var(--surface-2);
 display: grid;
 grid-template-columns: 1fr;
 gap: 4px 12px;
 }
 ul.saved-list li.empty {
 background: transparent;
-color: var(–muted);
+color: var(--muted);
 font-style: italic;
 border-style: dashed;
 text-align: center;
 padding: 18px;
 }
-.saved-title { font-weight: 700; font-size: 1rem; color: var(–ink); }
-.saved-meta { font-size: 0.82rem; color: var(–muted); margin-bottom: 4px; }
+.saved-title { font-weight: 700; font-size: 1rem; color: var(--ink); }
+.saved-meta { font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; }
 .saved-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .saved-actions .btn { margin: 0; }
 .rename-input { width: 100%; font-size: 1rem; font-weight: 700; }
@@ -573,8 +579,8 @@ padding: 18px;
 footer.page {
 margin-top: 36px;
 padding-top: 18px;
-border-top: 1px solid var(–border);
-color: var(–muted);
+border-top: 1px solid var(--border);
+color: var(--muted);
 font-size: 0.85rem;
 text-align: center;
 }
@@ -588,13 +594,12 @@ text-align: center;
     <div class="title-flourish" aria-hidden="true">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 4.5L13 7l-4.5 1.5L7 13l-1.5-4.5L1 7l4.5-1.5L7 1z" fill="currentColor"/></svg>
     </div>
-    <p class="subtitle">Compose accessible posts with image descriptions, mentions, and hashtags. Image descriptions become part of the post text itself — not alt text on the image — so they survive sharing across platforms. Share to Facebook (and on to Instagram with cross-posting), or copy and paste anywhere.</p>
+    <p class="subtitle">Compose accessible posts with image descriptions, mentions, and hashtags. Image descriptions become part of the post text itself -- not alt text on the image -- so they survive sharing across platforms. Share to Facebook (and on to Instagram with cross-posting), or copy and paste anywhere.</p>
   </header>
 
   <main>
     <h2 class="group-heading">Compose</h2>
 
-```
 <div class="section hero">
   <button class="section-toggle" type="button" aria-expanded="true" aria-controls="caption-body">
     <span class="toggle-content">
@@ -768,7 +773,7 @@ text-align: center;
         </div>
       </div>
       <div class="post-card-body">
-        <pre id="preview" class="preview empty" aria-live="polite">Empty — fill in any field above.</pre>
+        <pre id="preview" class="preview empty" aria-live="polite">Empty -- fill in any field above.</pre>
       </div>
     </div>
   </div>
@@ -785,7 +790,7 @@ text-align: center;
     <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div id="publish-body" class="section-body">
-    <p class="hint">Share opens the iOS share sheet — pick Facebook to send the post and any attached image. With Facebook cross-posting on, it carries through to Instagram with the image description intact.</p>
+    <p class="hint">Share opens the iOS share sheet -- pick Facebook to send the post and any attached image. With Facebook cross-posting on, it carries through to Instagram with the image description intact.</p>
     <button id="share-btn" class="btn primary" type="button">Share to…</button>
     <button id="copy-btn" class="btn" type="button">Copy combined post</button>
     <button id="clear-btn" class="btn danger" type="button">Clear all fields</button>
@@ -796,7 +801,27 @@ text-align: center;
     <p id="status" class="status" role="status" aria-live="polite"></p>
   </div>
 </div>
-```
+
+<h2 class="group-heading">Backup</h2>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="backup-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </span>
+      <span class="toggle-text"><span id="backup-summary-text">Backup</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="backup-body" class="section-body" hidden>
+    <p class="hint">Save all your drafts, templates and favourites to a file you can keep in iCloud Drive or Files. Restore from that file if anything is ever lost.</p>
+    <button id="export-btn" class="btn small" type="button">Export to file</button>
+    <label for="import-file" class="btn small file-button">Restore from file</label>
+    <input type="file" id="import-file" accept="application/json,.json">
+    <p id="backup-last" class="hint" style="margin-top: 10px;"></p>
+  </div>
+</div>
 
   </main>
 
@@ -814,11 +839,14 @@ text-align: center;
     drafts: 'captionBuilder.drafts.v3',
     templates: 'captionBuilder.templates.v3',
     mentionFavs: 'captionBuilder.mentionFavs.v3',
-    hashtagFavs: 'captionBuilder.hashtagFavs.v3'
+    hashtagFavs: 'captionBuilder.hashtagFavs.v3',
+    lastBackup: 'captionBuilder.lastBackup.v3'
   };
+  const BACKUP_KEYS = ['drafts', 'templates', 'mentionFavs', 'hashtagFavs'];
   const CAPTION_LIMIT = 2200;
   const HASHTAG_LIMIT = 30;
   let currentFile = null;
+  let currentMediaUrl = null;
   let statusTimer;
 
   function store_get(key) {
@@ -843,8 +871,8 @@ text-align: center;
   }
 
   function normalizeHashtags(text) {
-    return text.split(/[\s\n,]+/).map(s => s.trim()).filter(Boolean)
-      .map(s => '#' + s.replace(/^#+/, ''));
+    return text.split(/[\s\n,]+/).map(s => s.trim().replace(/^#+/, '')).filter(Boolean)
+      .map(s => '#' + s);
   }
 
   function showStatus(msg) {
@@ -1306,6 +1334,8 @@ text-align: center;
     renderMentions(d.mentions || []);
     const r = document.querySelector('input[name="position"][value="' + (d.position || 'start') + '"]');
     if (r) r.checked = true;
+    $('media').value = '';
+    clearMediaPreview();
     update();
     showStatus('Loaded draft: ' + (d.name || ('Draft ' + (i + 1))));
   }
@@ -1317,6 +1347,71 @@ text-align: center;
     store_set('drafts', drafts);
     renderDrafts();
     showStatus('Draft deleted.');
+  }
+
+  function renderBackupStatus() {
+    const ts = store_get('lastBackup');
+    const el = $('backup-last');
+    if (!el) return;
+    el.textContent = ts ? 'Last exported: ' + new Date(ts).toLocaleString() : 'Not exported yet.';
+  }
+
+  function exportBackup() {
+    const payload = {
+      app: 'post-builder',
+      version: 3,
+      exportedAt: new Date().toISOString(),
+      data: {}
+    };
+    BACKUP_KEYS.forEach(k => { payload.data[k] = store_get(k) || []; });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'post-builder-backup-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    store_set('lastBackup', Date.now());
+    renderBackupStatus();
+    showStatus('Backup file saved.');
+  }
+
+  function importBackup(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onerror = () => showStatus('Could not read that file.');
+    reader.onload = () => {
+      let parsed;
+      try { parsed = JSON.parse(String(reader.result)); }
+      catch (e) { showStatus('That file is not valid JSON.'); return; }
+      if (!parsed || parsed.app !== 'post-builder' || !parsed.data) {
+        showStatus('That file is not a Post Builder backup.');
+        return;
+      }
+      const counts = BACKUP_KEYS.map(k => {
+        const v = parsed.data[k];
+        return Array.isArray(v) ? v.length : 0;
+      });
+      const summary = 'Replace local data with backup?\n\n'
+        + counts[0] + ' drafts, ' + counts[1] + ' templates, '
+        + counts[2] + ' mention favourites, ' + counts[3] + ' hashtag favourites.\n\n'
+        + 'Your current drafts, templates and favourites will be overwritten.';
+      if (!confirm(summary)) return;
+      BACKUP_KEYS.forEach(k => {
+        const v = parsed.data[k];
+        store_set(k, Array.isArray(v) ? v : []);
+      });
+      renderMentionFavs();
+      renderHashtagFavs();
+      renderTemplates();
+      renderDrafts();
+      update();
+      showStatus('Backup restored.');
+    };
+    reader.readAsText(file);
   }
 
   function buildOutput() {
@@ -1372,7 +1467,7 @@ text-align: center;
       preview.textContent = output;
       preview.classList.remove('empty');
     } else {
-      preview.textContent = 'Empty — fill in any field above.';
+      preview.textContent = 'Empty -- fill in any field above.';
       preview.classList.add('empty');
     }
 
@@ -1455,27 +1550,35 @@ text-align: center;
     renderMentions([]);
     const startRadio = document.querySelector('input[name="position"][value="start"]');
     if (startRadio) startRadio.checked = true;
-    $('media-preview').hidden = true;
-    $('media-preview').innerHTML = '';
     $('media').value = '';
-    currentFile = null;
+    clearMediaPreview();
     update();
     showStatus('Cleared.');
   }
 
+  function clearMediaPreview() {
+    $('media-preview').innerHTML = '';
+    $('media-preview').hidden = true;
+    if (currentMediaUrl) {
+      URL.revokeObjectURL(currentMediaUrl);
+      currentMediaUrl = null;
+    }
+    currentFile = null;
+  }
+
   function handleMedia(e) {
     const file = e.target.files && e.target.files[0];
-    $('media-preview').innerHTML = '';
-    currentFile = file || null;
-    if (!file) { $('media-preview').hidden = true; updateSummaries(); return; }
-    const url = URL.createObjectURL(file);
+    clearMediaPreview();
+    if (!file) { updateSummaries(); return; }
+    currentFile = file;
+    currentMediaUrl = URL.createObjectURL(file);
     if (file.type.indexOf('image/') === 0) {
       const img = document.createElement('img');
-      img.src = url; img.alt = 'Preview of ' + file.name;
+      img.src = currentMediaUrl; img.alt = 'Preview of ' + file.name;
       $('media-preview').appendChild(img);
     } else if (file.type.indexOf('video/') === 0) {
       const v = document.createElement('video');
-      v.src = url; v.controls = true;
+      v.src = currentMediaUrl; v.controls = true;
       $('media-preview').appendChild(v);
     }
     const cap = document.createElement('p');
@@ -1505,6 +1608,12 @@ text-align: center;
   $('save-btn').addEventListener('click', saveDraft);
   $('clear-btn').addEventListener('click', clearAll);
   $('media').addEventListener('change', handleMedia);
+  $('export-btn').addEventListener('click', exportBackup);
+  $('import-file').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    importBackup(file);
+    e.target.value = '';
+  });
 
   if (!navigator.share) {
     $('share-btn').disabled = true;
@@ -1516,7 +1625,17 @@ text-align: center;
   renderHashtagFavs();
   renderTemplates();
   renderDrafts();
+  renderBackupStatus();
   update();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(() => {});
+  }
 })();
 </script>
 
