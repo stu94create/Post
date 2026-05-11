@@ -1,5 +1,5 @@
 // Bump CACHE_VERSION whenever index.html changes so clients pick it up.
-const CACHE_VERSION = 'post-builder-v7';
+const CACHE_VERSION = 'post-builder-v8';
 const APP_SHELL = ['./', './index.html'];
 
 self.addEventListener('install', (event) => {

@@ -124,6 +124,57 @@ max-width: 56ch;
 line-height: 1.5;
 }
 
+.help-disclosure {
+  margin: 20px 0 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.help-disclosure[open] {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+.help-disclosure > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 18px;
+  font-family: 'EB Garamond', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 52px;
+  -webkit-tap-highlight-color: transparent;
+}
+.help-disclosure > summary::-webkit-details-marker { display: none; }
+.help-disclosure > summary:focus-visible {
+  outline: 3px solid var(--accent-2);
+  outline-offset: -3px;
+  border-radius: var(--radius);
+}
+.help-disclosure > summary::after {
+  content: '';
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease-out;
+  margin-right: 4px;
+}
+.help-disclosure[open] > summary::after {
+  transform: rotate(-135deg);
+  border-color: var(--accent);
+}
+.help-disclosure > .subtitle { padding: 0 18px; }
+.help-disclosure > .subtitle:first-of-type { margin-top: 4px; }
+.help-disclosure > .subtitle:last-of-type { padding-bottom: 18px; }
+
 /* Group headings (h2) */
 h2.group-heading {
 font-family: 'EB Garamond', serif;
@@ -615,11 +666,14 @@ text-align: center;
     <div class="title-flourish" aria-hidden="true">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 4.5L13 7l-4.5 1.5L7 13l-1.5-4.5L1 7l4.5-1.5L7 1z" fill="currentColor"/></svg>
     </div>
-    <p class="subtitle">This app helps you write Facebook posts that work well when Facebook cross-posts them to Instagram. The trick is putting the image description inside the post itself, instead of in Facebook's alt-text box — that way it doesn't get stripped when the post crosses to Instagram.</p>
-    <p class="subtitle">If you attach more than one photo, each photo gets its own description box. Switching photos wipes the boxes so old text never ends up on the wrong picture.</p>
-    <p class="subtitle">The Mentions list is a place to keep names beginning with @ for quick use. Saved names are not added to your post. Tap a name to copy it to the clipboard, then paste it in Facebook where you want it. (Facebook only makes a real tag when you type @ inside Facebook and pick a name from its suggestion list — pasted text stays as plain text.) Tap "Edit list" to remove names you no longer need.</p>
-    <p class="subtitle">When you're ready, tap "Share to…". iOS opens its share menu and your text is also copied to the clipboard at the same moment. If Facebook only takes part of the text, paste into the Facebook post box and the full post drops in. Hashtags become clickable when the post goes live; mentions stay as plain text.</p>
-    <p class="subtitle">Drafts, saved names and hashtag lists live on this phone. The Backup section at the bottom saves a copy you can keep in iCloud Drive or Files. If anything is ever lost, restore it from that file.</p>
+    <details id="help-disclosure" class="help-disclosure" open>
+      <summary>How to use this app</summary>
+      <p class="subtitle">This app helps you write Facebook posts that work well when Facebook cross-posts them to Instagram. The trick is putting the image description inside the post itself, instead of in Facebook's alt-text box — that way it doesn't get stripped when the post crosses to Instagram.</p>
+      <p class="subtitle">If you attach more than one photo, each photo gets its own description box. Switching photos wipes the boxes so old text never ends up on the wrong picture.</p>
+      <p class="subtitle">The Mentions list is a place to keep names beginning with @ for quick use. Saved names are not added to your post. Tap a name to copy it to the clipboard, then paste it in Facebook where you want it. (Facebook only makes a real tag when you type @ inside Facebook and pick a name from its suggestion list — pasted text stays as plain text.) Tap "Edit list" to remove names you no longer need.</p>
+      <p class="subtitle">When you're ready, tap "Share to…". iOS opens its share menu and your text is also copied to the clipboard at the same moment. If Facebook only takes part of the text, paste into the Facebook post box and the full post drops in. Hashtags become clickable when the post goes live; mentions stay as plain text.</p>
+      <p class="subtitle">Drafts, saved names and hashtag lists live on this phone. The Backup section at the bottom saves a copy you can keep in iCloud Drive or Files. If anything is ever lost, restore it from that file.</p>
+    </details>
   </header>
 
   <main>
@@ -866,7 +920,8 @@ text-align: center;
     templates: 'captionBuilder.templates.v3',
     mentionFavs: 'captionBuilder.mentionFavs.v3',
     hashtagFavs: 'captionBuilder.hashtagFavs.v3',
-    lastBackup: 'captionBuilder.lastBackup.v3'
+    lastBackup: 'captionBuilder.lastBackup.v3',
+    helpOpen: 'captionBuilder.helpOpen.v3'
   };
   const BACKUP_KEYS = ['drafts', 'templates', 'mentionFavs', 'hashtagFavs'];
   const CAPTION_LIMIT = 2200;
@@ -1678,6 +1733,12 @@ text-align: center;
   renderDrafts();
   renderBackupStatus();
   update();
+
+  const helpEl = $('help-disclosure');
+  if (helpEl) {
+    if (store_get('helpOpen') === false) helpEl.removeAttribute('open');
+    helpEl.addEventListener('toggle', () => store_set('helpOpen', helpEl.open));
+  }
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
