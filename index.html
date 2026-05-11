@@ -750,25 +750,6 @@ text-align: center;
   </div>
 </div>
 
-<div class="section">
-  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="backup-body">
-    <span class="toggle-content">
-      <span class="section-icon-glyph" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </span>
-      <span class="toggle-text"><span id="backup-summary-text">Backup</span></span>
-    </span>
-    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
-  <div id="backup-body" class="section-body" hidden>
-    <p class="hint">Save all your drafts, templates and favourites to a file you can keep in iCloud Drive or Files. Restore from that file if anything is ever lost.</p>
-    <button id="export-btn" class="btn small" type="button">Export to file</button>
-    <label for="import-file" class="btn small file-button">Restore from file</label>
-    <input type="file" id="import-file" accept="application/json,.json">
-    <p id="backup-last" class="hint" style="margin-top: 10px;"></p>
-  </div>
-</div>
-
 <h2 class="group-heading">Preview &amp; Publish</h2>
 
 <div class="section">
@@ -818,6 +799,27 @@ text-align: center;
       <button id="save-btn" class="btn" type="button">Save as draft</button>
     </div>
     <p id="status" class="status" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
+<h2 class="group-heading">Backup</h2>
+
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="backup-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </span>
+      <span class="toggle-text"><span id="backup-summary-text">Backup</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="backup-body" class="section-body" hidden>
+    <p class="hint">Save all your drafts, templates and favourites to a file you can keep in iCloud Drive or Files. Restore from that file if anything is ever lost.</p>
+    <button id="export-btn" class="btn small" type="button">Export to file</button>
+    <label for="import-file" class="btn small file-button">Restore from file</label>
+    <input type="file" id="import-file" accept="application/json,.json">
+    <p id="backup-last" class="hint" style="margin-top: 10px;"></p>
   </div>
 </div>
 
