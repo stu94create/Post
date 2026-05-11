@@ -592,7 +592,8 @@ padding: 0; margin: -1px; overflow: hidden;
 clip: rect(0, 0, 0, 0); border: 0;
 }
 #media-preview { margin-top: 14px; display: flex; flex-direction: column; gap: 14px; }
-#media-preview .media-item { display: flex; flex-direction: column; gap: 4px; }
+#media-preview .media-item { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+#media-preview .media-item img, #media-preview .media-item video { align-self: stretch; }
 #media-preview img, #media-preview video {
 max-width: 100%; height: auto;
 border-radius: var(--radius-sm);
@@ -1660,33 +1661,59 @@ text-align: center;
     currentFiles = [];
   }
 
+  function renderMediaPreview() {
+    const preview = $('media-preview');
+    preview.innerHTML = '';
+    if (!currentFiles.length) { preview.hidden = true; return; }
+    currentFiles.forEach((file, idx) => {
+      const url = currentMediaUrls[idx];
+      const item = document.createElement('div');
+      item.className = 'media-item';
+      if (file.type.indexOf('image/') === 0) {
+        const img = document.createElement('img');
+        img.src = url; img.alt = 'Preview of ' + file.name;
+        item.appendChild(img);
+      } else if (file.type.indexOf('video/') === 0) {
+        const v = document.createElement('video');
+        v.src = url; v.controls = true;
+        item.appendChild(v);
+      }
+      const cap = document.createElement('p');
+      cap.className = 'media-caption'; cap.textContent = file.name;
+      item.appendChild(cap);
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'btn small danger';
+      removeBtn.textContent = 'Remove';
+      removeBtn.setAttribute('aria-label', 'Remove ' + file.name);
+      removeBtn.addEventListener('click', () => removePhoto(idx));
+      item.appendChild(removeBtn);
+      preview.appendChild(item);
+    });
+    preview.hidden = false;
+  }
+
+  function removePhoto(idx) {
+    const file = currentFiles[idx];
+    if (!file) return;
+    const hasAltText = getAlts().some(a => a.trim());
+    if (hasAltText && !confirm('Remove ' + file.name + '? The image descriptions will be cleared.')) return;
+    if (currentMediaUrls[idx]) URL.revokeObjectURL(currentMediaUrls[idx]);
+    currentFiles.splice(idx, 1);
+    currentMediaUrls.splice(idx, 1);
+    $('media').value = '';
+    renderMediaPreview();
+    renderAltFields([]);
+    update();
+    showStatus('Removed ' + file.name);
+  }
+
   function handleMedia(e) {
     const files = Array.from(e.target.files || []);
     clearMediaPreview();
     currentFiles = files;
-    if (files.length) {
-      const preview = $('media-preview');
-      files.forEach((file) => {
-        const url = URL.createObjectURL(file);
-        currentMediaUrls.push(url);
-        const item = document.createElement('div');
-        item.className = 'media-item';
-        if (file.type.indexOf('image/') === 0) {
-          const img = document.createElement('img');
-          img.src = url; img.alt = 'Preview of ' + file.name;
-          item.appendChild(img);
-        } else if (file.type.indexOf('video/') === 0) {
-          const v = document.createElement('video');
-          v.src = url; v.controls = true;
-          item.appendChild(v);
-        }
-        const cap = document.createElement('p');
-        cap.className = 'media-caption'; cap.textContent = file.name;
-        item.appendChild(cap);
-        preview.appendChild(item);
-      });
-      preview.hidden = false;
-    }
+    currentMediaUrls = files.map(f => URL.createObjectURL(f));
+    renderMediaPreview();
     renderAltFields([]);
     update();
   }
