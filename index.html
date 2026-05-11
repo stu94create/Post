@@ -3,8 +3,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Post Builder</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Post Builder">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#b04a2e" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14110d" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -744,6 +750,25 @@ text-align: center;
   </div>
 </div>
 
+<div class="section">
+  <button class="section-toggle" type="button" aria-expanded="false" aria-controls="backup-body">
+    <span class="toggle-content">
+      <span class="section-icon-glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </span>
+      <span class="toggle-text"><span id="backup-summary-text">Backup</span></span>
+    </span>
+    <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="backup-body" class="section-body" hidden>
+    <p class="hint">Save all your drafts, templates and favourites to a file you can keep in iCloud Drive or Files. Restore from that file if anything is ever lost.</p>
+    <button id="export-btn" class="btn small" type="button">Export to file</button>
+    <label for="import-file" class="btn small file-button">Restore from file</label>
+    <input type="file" id="import-file" accept="application/json,.json">
+    <p id="backup-last" class="hint" style="margin-top: 10px;"></p>
+  </div>
+</div>
+
 <h2 class="group-heading">Preview &amp; Publish</h2>
 
 <div class="section">
@@ -812,8 +837,10 @@ text-align: center;
     drafts: 'captionBuilder.drafts.v3',
     templates: 'captionBuilder.templates.v3',
     mentionFavs: 'captionBuilder.mentionFavs.v3',
-    hashtagFavs: 'captionBuilder.hashtagFavs.v3'
+    hashtagFavs: 'captionBuilder.hashtagFavs.v3',
+    lastBackup: 'captionBuilder.lastBackup.v3'
   };
+  const BACKUP_KEYS = ['drafts', 'templates', 'mentionFavs', 'hashtagFavs'];
   const CAPTION_LIMIT = 2200;
   const HASHTAG_LIMIT = 30;
   let currentFile = null;
@@ -1320,6 +1347,71 @@ text-align: center;
     showStatus('Draft deleted.');
   }
 
+  function renderBackupStatus() {
+    const ts = store_get('lastBackup');
+    const el = $('backup-last');
+    if (!el) return;
+    el.textContent = ts ? 'Last exported: ' + new Date(ts).toLocaleString() : 'Not exported yet.';
+  }
+
+  function exportBackup() {
+    const payload = {
+      app: 'post-builder',
+      version: 3,
+      exportedAt: new Date().toISOString(),
+      data: {}
+    };
+    BACKUP_KEYS.forEach(k => { payload.data[k] = store_get(k) || []; });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'post-builder-backup-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    store_set('lastBackup', Date.now());
+    renderBackupStatus();
+    showStatus('Backup file saved.');
+  }
+
+  function importBackup(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onerror = () => showStatus('Could not read that file.');
+    reader.onload = () => {
+      let parsed;
+      try { parsed = JSON.parse(String(reader.result)); }
+      catch (e) { showStatus('That file is not valid JSON.'); return; }
+      if (!parsed || parsed.app !== 'post-builder' || !parsed.data) {
+        showStatus('That file is not a Post Builder backup.');
+        return;
+      }
+      const counts = BACKUP_KEYS.map(k => {
+        const v = parsed.data[k];
+        return Array.isArray(v) ? v.length : 0;
+      });
+      const summary = 'Replace local data with backup?\n\n'
+        + counts[0] + ' drafts, ' + counts[1] + ' templates, '
+        + counts[2] + ' mention favourites, ' + counts[3] + ' hashtag favourites.\n\n'
+        + 'Your current drafts, templates and favourites will be overwritten.';
+      if (!confirm(summary)) return;
+      BACKUP_KEYS.forEach(k => {
+        const v = parsed.data[k];
+        store_set(k, Array.isArray(v) ? v : []);
+      });
+      renderMentionFavs();
+      renderHashtagFavs();
+      renderTemplates();
+      renderDrafts();
+      update();
+      showStatus('Backup restored.');
+    };
+    reader.readAsText(file);
+  }
+
   function buildOutput() {
     const caption = getCaption().trim();
     const mentions = getMentions().map(m => '@' + m).join(' ');
@@ -1514,6 +1606,12 @@ text-align: center;
   $('save-btn').addEventListener('click', saveDraft);
   $('clear-btn').addEventListener('click', clearAll);
   $('media').addEventListener('change', handleMedia);
+  $('export-btn').addEventListener('click', exportBackup);
+  $('import-file').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    importBackup(file);
+    e.target.value = '';
+  });
 
   if (!navigator.share) {
     $('share-btn').disabled = true;
@@ -1525,7 +1623,17 @@ text-align: center;
   renderHashtagFavs();
   renderTemplates();
   renderDrafts();
+  renderBackupStatus();
   update();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(() => {});
+  }
 })();
 </script>
 
