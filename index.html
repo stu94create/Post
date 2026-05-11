@@ -520,7 +520,8 @@ position: absolute; width: 1px; height: 1px;
 padding: 0; margin: -1px; overflow: hidden;
 clip: rect(0, 0, 0, 0); border: 0;
 }
-#media-preview { margin-top: 14px; }
+#media-preview { margin-top: 14px; display: flex; flex-direction: column; gap: 14px; }
+#media-preview .media-item { display: flex; flex-direction: column; gap: 4px; }
 #media-preview img, #media-preview video {
 max-width: 100%; height: auto;
 border-radius: var(--radius-sm);
@@ -631,7 +632,7 @@ text-align: center;
   </button>
   <div id="mentions-body" class="section-body" hidden>
     <div class="field">
-      <p class="hint">One handle per row. The @ is added automatically.</p>
+      <p class="hint">One handle per row. The @ is added automatically. On Facebook these appear as plain text in the post — they do not tag the account.</p>
       <div id="mentions-list"></div>
       <button id="add-mention-btn" class="btn small" type="button">Add another mention</button>
       <button id="save-mention-favs-btn" class="btn small" type="button">Save current to favourites</button>
@@ -703,10 +704,10 @@ text-align: center;
     <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div id="media-body" class="section-body" hidden>
-    <p class="hint">Optional. Attaching here means it goes through the share sheet with the post.</p>
+    <p class="hint">Optional. Pick one or several — they all go through the share sheet with the post.</p>
     <div class="field">
-      <label for="media" class="file-button">Choose file</label>
-      <input type="file" id="media" accept="image/*,video/*">
+      <label for="media" class="file-button">Choose files</label>
+      <input type="file" id="media" accept="image/*,video/*" multiple>
     </div>
     <div id="media-preview" hidden></div>
   </div>
@@ -845,8 +846,8 @@ text-align: center;
   const BACKUP_KEYS = ['drafts', 'templates', 'mentionFavs', 'hashtagFavs'];
   const CAPTION_LIMIT = 2200;
   const HASHTAG_LIMIT = 30;
-  let currentFile = null;
-  let currentMediaUrl = null;
+  let currentFiles = [];
+  let currentMediaUrls = [];
   let statusTimer;
 
   function store_get(key) {
@@ -1455,7 +1456,10 @@ text-align: center;
     setSum('mentions-summary-text', 'Mentions', mc ? String(mc) : '');
     setSum('hashtags-summary-text', 'Hashtags', tags ? tags + (tags > HASHTAG_LIMIT ? ' (over)' : '') : '');
     setSum('alt-summary-text', 'Image description', alt ? 'filled' : '');
-    setSum('media-summary-text', 'Image or video', currentFile ? 'attached' : '');
+    setSum('media-summary-text', 'Image or video',
+      currentFiles.length
+        ? (currentFiles.length === 1 ? 'attached' : currentFiles.length + ' attached')
+        : '');
     setSum('templates-summary-text', 'Templates', templates ? templates + ' saved' : '');
     setSum('drafts-summary-text', 'Saved drafts', drafts ? drafts + ' saved' : '');
   }
@@ -1505,21 +1509,41 @@ text-align: center;
     if (r) r.checked = true;
   }
 
+  async function copyToClipboard(text) {
+    if (!text) return false;
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (err) {}
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
   async function shareOutput() {
     const text = buildOutput();
-    if (!text && !currentFile) { showStatus('Nothing to share yet.'); return; }
+    const hasFiles = currentFiles.length > 0;
+    if (!text && !hasFiles) { showStatus('Nothing to share yet.'); return; }
     if (!navigator.share) {
       showStatus('Share sheet not supported here. Use Copy instead.');
       return;
     }
+    const copied = text ? await copyToClipboard(text) : false;
     const data = {};
     if (text) data.text = text;
-    if (currentFile && navigator.canShare && navigator.canShare({ files: [currentFile] })) {
-      data.files = [currentFile];
+    if (hasFiles && navigator.canShare && navigator.canShare({ files: currentFiles })) {
+      data.files = currentFiles;
     }
     try {
       await navigator.share(data);
-      showStatus('Shared.');
+      showStatus(copied
+        ? 'Shared. Text also copied — paste in Facebook if it did not carry through.'
+        : 'Shared.');
     } catch (e) {
       if (e && e.name === 'AbortError') return;
       showStatus('Share failed: ' + (e && e.message ? e.message : 'unknown error'));
@@ -1529,17 +1553,8 @@ text-align: center;
   async function copyOutput() {
     const text = buildOutput();
     if (!text) { showStatus('Nothing to copy yet.'); return; }
-    try {
-      await navigator.clipboard.writeText(text);
-      showStatus('Copied to clipboard.');
-    } catch (e) {
-      const ta = document.createElement('textarea');
-      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); showStatus('Copied to clipboard.'); }
-      catch (err) { showStatus('Could not copy. Select the preview text manually.'); }
-      document.body.removeChild(ta);
-    }
+    const ok = await copyToClipboard(text);
+    showStatus(ok ? 'Copied to clipboard.' : 'Could not copy. Select the preview text manually.');
   }
 
   function clearAll() {
@@ -1559,32 +1574,37 @@ text-align: center;
   function clearMediaPreview() {
     $('media-preview').innerHTML = '';
     $('media-preview').hidden = true;
-    if (currentMediaUrl) {
-      URL.revokeObjectURL(currentMediaUrl);
-      currentMediaUrl = null;
-    }
-    currentFile = null;
+    currentMediaUrls.forEach(u => URL.revokeObjectURL(u));
+    currentMediaUrls = [];
+    currentFiles = [];
   }
 
   function handleMedia(e) {
-    const file = e.target.files && e.target.files[0];
+    const files = Array.from(e.target.files || []);
     clearMediaPreview();
-    if (!file) { updateSummaries(); return; }
-    currentFile = file;
-    currentMediaUrl = URL.createObjectURL(file);
-    if (file.type.indexOf('image/') === 0) {
-      const img = document.createElement('img');
-      img.src = currentMediaUrl; img.alt = 'Preview of ' + file.name;
-      $('media-preview').appendChild(img);
-    } else if (file.type.indexOf('video/') === 0) {
-      const v = document.createElement('video');
-      v.src = currentMediaUrl; v.controls = true;
-      $('media-preview').appendChild(v);
-    }
-    const cap = document.createElement('p');
-    cap.className = 'media-caption'; cap.textContent = file.name;
-    $('media-preview').appendChild(cap);
-    $('media-preview').hidden = false;
+    if (!files.length) { updateSummaries(); return; }
+    currentFiles = files;
+    const preview = $('media-preview');
+    files.forEach((file) => {
+      const url = URL.createObjectURL(file);
+      currentMediaUrls.push(url);
+      const item = document.createElement('div');
+      item.className = 'media-item';
+      if (file.type.indexOf('image/') === 0) {
+        const img = document.createElement('img');
+        img.src = url; img.alt = 'Preview of ' + file.name;
+        item.appendChild(img);
+      } else if (file.type.indexOf('video/') === 0) {
+        const v = document.createElement('video');
+        v.src = url; v.controls = true;
+        item.appendChild(v);
+      }
+      const cap = document.createElement('p');
+      cap.className = 'media-caption'; cap.textContent = file.name;
+      item.appendChild(cap);
+      preview.appendChild(item);
+    });
+    preview.hidden = false;
     updateSummaries();
   }
 
