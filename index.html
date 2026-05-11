@@ -353,6 +353,16 @@ text-align: center;
 .mention-row input { flex: 1; min-width: 0; }
 .mention-row .btn { margin: 0; flex-shrink: 0; }
 
+.alt-field-row { margin-bottom: 14px; }
+.alt-field-row:last-child { margin-bottom: 0; }
+.alt-field-row > label {
+  display: block;
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--ink-2);
+}
+
 .chip-list {
 display: flex;
 flex-wrap: wrap;
@@ -631,13 +641,15 @@ text-align: center;
     <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div id="mentions-body" class="section-body" hidden>
+    <p class="hint">A reference list of handles. These are <strong>not</strong> added to your post — Facebook only tags an account when you type @ in its composer and pick from the suggestion list. Tap any saved handle to copy it to the clipboard.</p>
     <div class="field">
-      <p class="hint">One handle per row. The @ is added automatically. On Facebook these appear as plain text in the post — they do not tag the account.</p>
-      <div id="mentions-list"></div>
-      <button id="add-mention-btn" class="btn small" type="button">Add another mention</button>
-      <button id="save-mention-favs-btn" class="btn small" type="button">Save current to favourites</button>
+      <div class="mention-row">
+        <span class="at-prefix" aria-hidden="true">@</span>
+        <input id="new-mention-input" type="text" aria-label="New mention handle" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="handle">
+        <button id="add-mention-fav-btn" class="btn small" type="button">Save</button>
+      </div>
     </div>
-    <h3>Favourite mentions</h3>
+    <h3>Saved mentions</h3>
     <div id="mention-favs" class="chip-list"></div>
   </div>
 </div>
@@ -675,10 +687,8 @@ text-align: center;
     <svg class="section-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div id="alt-body" class="section-body" hidden>
-    <div class="field">
-      <p class="hint">Wrapped as "[Image description: ...]" in the output.</p>
-      <textarea id="alt" rows="4" aria-label="Image description"></textarea>
-    </div>
+    <p class="hint">Wrapped as "[Image description: …]" in the output. Attach photos first if you want a separate description per photo — descriptions clear when the attached photos change.</p>
+    <div id="alt-fields" class="field"></div>
     <fieldset class="field">
       <legend>Description position</legend>
       <label class="radio">
@@ -774,7 +784,7 @@ text-align: center;
         </div>
       </div>
       <div class="post-card-body">
-        <pre id="preview" class="preview empty" aria-live="polite">Empty -- fill in any field above.</pre>
+        <pre id="preview" class="preview empty" aria-live="polite">Empty — fill in any field above.</pre>
       </div>
     </div>
   </div>
@@ -860,15 +870,13 @@ text-align: center;
 
   function getCaption() { return $('caption').value; }
   function getHashtags() { return $('hashtags').value; }
-  function getAlt() { return $('alt').value; }
+  function getAlts() {
+    return Array.from(document.querySelectorAll('#alt-fields textarea'))
+      .map(ta => ta.value);
+  }
   function getPosition() {
     const r = document.querySelector('input[name="position"]:checked');
     return r ? r.value : 'start';
-  }
-  function getMentions() {
-    return Array.from(document.querySelectorAll('.mention-input'))
-      .map(i => i.value.trim().replace(/^@+/, ''))
-      .filter(Boolean);
   }
 
   function normalizeHashtags(text) {
@@ -894,47 +902,6 @@ text-align: center;
     });
   }
 
-  function addMentionRow(value, focus) {
-    const list = $('mentions-list');
-    const row = document.createElement('div');
-    row.className = 'mention-row';
-    const prefix = document.createElement('span');
-    prefix.className = 'at-prefix';
-    prefix.textContent = '@';
-    prefix.setAttribute('aria-hidden', 'true');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'mention-input';
-    input.value = value || '';
-    input.setAttribute('aria-label', 'Mention handle');
-    input.setAttribute('autocapitalize', 'off');
-    input.setAttribute('autocorrect', 'off');
-    input.setAttribute('spellcheck', 'false');
-    input.addEventListener('input', update);
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'btn small danger';
-    remove.textContent = 'Remove';
-    remove.setAttribute('aria-label', 'Remove this mention row');
-    remove.addEventListener('click', () => {
-      row.remove();
-      if (list.children.length === 0) addMentionRow('', false);
-      update();
-    });
-    row.appendChild(prefix);
-    row.appendChild(input);
-    row.appendChild(remove);
-    list.appendChild(row);
-    if (focus) input.focus();
-  }
-
-  function renderMentions(mentions) {
-    const list = $('mentions-list');
-    list.innerHTML = '';
-    const arr = (mentions && mentions.length) ? mentions : [''];
-    arr.forEach(m => addMentionRow(m, false));
-  }
-
   function renderMentionFavs() {
     const favs = store_get('mentionFavs') || [];
     const container = $('mention-favs');
@@ -942,54 +909,79 @@ text-align: center;
     if (!favs.length) {
       const p = document.createElement('p');
       p.className = 'empty-note';
-      p.textContent = 'No favourite mentions yet.';
+      p.textContent = 'No saved mentions yet.';
       container.appendChild(p);
       return;
     }
-    favs.forEach((m, i) => {
+    favs.forEach((m) => {
       const chip = document.createElement('div');
       chip.className = 'chip';
-      const add = document.createElement('button');
-      add.type = 'button'; add.className = 'chip-add';
-      add.textContent = '@' + m;
-      add.setAttribute('aria-label', 'Add mention ' + m + ' to current post');
-      add.addEventListener('click', () => {
-        const existing = getMentions();
-        if (existing.includes(m)) { showStatus('@' + m + ' is already added.'); return; }
-        const inputs = document.querySelectorAll('.mention-input');
-        const empty = Array.from(inputs).find(inp => !inp.value.trim());
-        if (empty) { empty.value = m; }
-        else { addMentionRow(m, false); }
-        update();
-        showStatus('Added @' + m);
+      const copy = document.createElement('button');
+      copy.type = 'button'; copy.className = 'chip-add';
+      copy.textContent = '@' + m;
+      copy.setAttribute('aria-label', 'Copy @' + m + ' to clipboard');
+      copy.addEventListener('click', async () => {
+        const ok = await copyToClipboard('@' + m);
+        showStatus(ok ? 'Copied @' + m : 'Could not copy @' + m);
       });
       const del = document.createElement('button');
       del.type = 'button'; del.className = 'chip-remove';
       del.textContent = '✕';
-      del.setAttribute('aria-label', 'Remove ' + m + ' from favourite mentions');
+      del.setAttribute('aria-label', 'Remove @' + m + ' from saved mentions');
       del.addEventListener('click', () => {
-        const f = store_get('mentionFavs') || [];
-        f.splice(i, 1);
+        if (!confirm('Remove @' + m + ' from saved mentions?')) return;
+        const f = (store_get('mentionFavs') || []).filter(x => x !== m);
         store_set('mentionFavs', f);
         renderMentionFavs();
-        showStatus('Removed @' + m + ' from favourites.');
+        updateSummaries();
+        showStatus('Removed @' + m);
       });
-      chip.appendChild(add);
+      chip.appendChild(copy);
       chip.appendChild(del);
       container.appendChild(chip);
     });
   }
 
-  function saveMentionsToFavs() {
-    const current = getMentions();
-    if (!current.length) { showStatus('No mentions to save.'); return; }
+  function addMentionFavourite() {
+    const input = $('new-mention-input');
+    const handle = input.value.trim().replace(/^@+/, '');
+    if (!handle) { showStatus('Type a handle first.'); input.focus(); return; }
     const favs = store_get('mentionFavs') || [];
-    let added = 0;
-    current.forEach(m => { if (!favs.includes(m)) { favs.push(m); added++; } });
+    if (favs.includes(handle)) { showStatus('@' + handle + ' is already saved.'); input.select(); return; }
+    favs.push(handle);
     favs.sort((a, b) => a.localeCompare(b));
     store_set('mentionFavs', favs);
+    input.value = '';
     renderMentionFavs();
-    showStatus(added ? 'Saved ' + added + ' to favourites.' : 'All already saved.');
+    updateSummaries();
+    showStatus('Saved @' + handle);
+  }
+
+  function renderAltFields(values) {
+    const container = $('alt-fields');
+    container.innerHTML = '';
+    const photoCount = currentFiles.length;
+    const arr = Array.isArray(values) ? values.slice() : [];
+    const n = Math.max(1, photoCount, arr.length);
+    for (let i = 0; i < n; i++) {
+      const row = document.createElement('div');
+      row.className = 'alt-field-row';
+      const id = 'alt-' + i;
+      const label = document.createElement('label');
+      label.htmlFor = id;
+      const fname = currentFiles[i] ? ' — ' + currentFiles[i].name : '';
+      label.textContent = n === 1
+        ? 'Image description' + fname
+        : 'Image ' + (i + 1) + ' of ' + n + fname;
+      const ta = document.createElement('textarea');
+      ta.id = id;
+      ta.rows = 4;
+      ta.value = arr[i] || '';
+      ta.addEventListener('input', update);
+      row.appendChild(label);
+      row.appendChild(ta);
+      container.appendChild(row);
+    }
   }
 
   function renderHashtagFavs() {
@@ -1066,13 +1058,8 @@ text-align: center;
     const li = document.createElement('li');
     const meta = document.createElement('span');
     meta.className = 'saved-meta';
-    const bits = [];
-    if (t.mentions && t.mentions.length) bits.push(t.mentions.length + ' mention' + (t.mentions.length === 1 ? '' : 's'));
-    if (t.hashtags) {
-      const c = normalizeHashtags(t.hashtags).length;
-      bits.push(c + ' hashtag' + (c === 1 ? '' : 's'));
-    }
-    meta.textContent = bits.length ? 'Contains: ' + bits.join(', ') : 'Empty';
+    const c = t.hashtags ? normalizeHashtags(t.hashtags).length : 0;
+    meta.textContent = c ? c + ' hashtag' + (c === 1 ? '' : 's') : 'Empty';
 
     const actions = document.createElement('div');
     actions.className = 'saved-actions';
@@ -1155,8 +1142,8 @@ text-align: center;
   }
 
   function saveTemplate() {
-    if (!getMentions().length && !getHashtags().trim()) {
-      showStatus('Add some mentions or hashtags first.');
+    if (!getHashtags().trim()) {
+      showStatus('Add some hashtags first.');
       return;
     }
     const nameInput = $('template-name');
@@ -1169,7 +1156,6 @@ text-align: center;
     const templates = store_get('templates') || [];
     templates.unshift({
       name: name,
-      mentions: getMentions(),
       hashtags: getHashtags(),
       savedAt: Date.now()
     });
@@ -1184,10 +1170,8 @@ text-align: center;
     const templates = store_get('templates') || [];
     const t = templates[i];
     if (!t) return;
-    const hasContent = getMentions().length || getHashtags().trim();
-    if (hasContent && !confirm('Apply this template? Your current mentions and hashtags will be replaced. The post text and image description will be kept.')) return;
+    if (getHashtags().trim() && !confirm('Apply this template? Your current hashtags will be replaced.')) return;
     $('hashtags').value = t.hashtags || '';
-    renderMentions(t.mentions || []);
     update();
     showStatus('Applied template: ' + (t.name || ('Template ' + (i + 1))));
   }
@@ -1302,7 +1286,8 @@ text-align: center;
   }
 
   function saveDraft() {
-    if (!getCaption().trim() && !getMentions().length && !getHashtags().trim() && !getAlt().trim()) {
+    const altsFilled = getAlts().some(a => a.trim());
+    if (!getCaption().trim() && !getHashtags().trim() && !altsFilled) {
       showStatus('Nothing to save yet.');
       return;
     }
@@ -1312,9 +1297,8 @@ text-align: center;
     drafts.unshift({
       name: name,
       caption: getCaption(),
-      mentions: getMentions(),
       hashtags: getHashtags(),
-      alt: getAlt(),
+      alts: getAlts(),
       position: getPosition(),
       savedAt: Date.now()
     });
@@ -1331,12 +1315,12 @@ text-align: center;
     if (!d) return;
     $('caption').value = d.caption || '';
     $('hashtags').value = d.hashtags || '';
-    $('alt').value = d.alt || '';
-    renderMentions(d.mentions || []);
-    const r = document.querySelector('input[name="position"][value="' + (d.position || 'start') + '"]');
-    if (r) r.checked = true;
     $('media').value = '';
     clearMediaPreview();
+    const alts = Array.isArray(d.alts) ? d.alts : (d.alt ? [d.alt] : []);
+    renderAltFields(alts);
+    const r = document.querySelector('input[name="position"][value="' + (d.position || 'start') + '"]');
+    if (r) r.checked = true;
     update();
     showStatus('Loaded draft: ' + (d.name || ('Draft ' + (i + 1))));
   }
@@ -1417,15 +1401,23 @@ text-align: center;
 
   function buildOutput() {
     const caption = getCaption().trim();
-    const mentions = getMentions().map(m => '@' + m).join(' ');
     const hashtags = normalizeHashtags(getHashtags()).join(' ');
-    const alt = getAlt().trim();
-    const descBlock = alt ? '[Image description: ' + alt + ']' : '';
-    const body = [caption, mentions].filter(Boolean).join('\n\n');
+    const alts = getAlts().map(a => a.trim());
+    const photoCount = currentFiles.length;
+    let descBlock = '';
+    if (photoCount > 1) {
+      const blocks = [];
+      alts.forEach((a, i) => {
+        if (a) blocks.push('[Image ' + (i + 1) + ' of ' + photoCount + ': ' + a + ']');
+      });
+      descBlock = blocks.join('\n');
+    } else if (alts[0]) {
+      descBlock = '[Image description: ' + alts[0] + ']';
+    }
     const position = getPosition();
     const parts = [];
     if (position === 'start' && descBlock) parts.push(descBlock);
-    if (body) parts.push(body);
+    if (caption) parts.push(caption);
     if (hashtags) parts.push(hashtags);
     if (position === 'end' && descBlock) parts.push(descBlock);
     return parts.join('\n\n');
@@ -1433,9 +1425,10 @@ text-align: center;
 
   function updateSummaries() {
     const cap = getCaption();
-    const mc = getMentions().length;
+    const savedMentions = (store_get('mentionFavs') || []).length;
     const tags = normalizeHashtags(getHashtags()).length;
-    const alt = getAlt();
+    const alts = getAlts();
+    const altsFilled = alts.filter(a => a.trim()).length;
     const templates = (store_get('templates') || []).length;
     const drafts = (store_get('drafts') || []).length;
 
@@ -1453,9 +1446,12 @@ text-align: center;
       }
     }
     setSum('caption-summary-text', 'Post', cap ? cap.length + ' chars' : '');
-    setSum('mentions-summary-text', 'Mentions', mc ? String(mc) : '');
+    setSum('mentions-summary-text', 'Mentions', savedMentions ? savedMentions + ' saved' : '');
     setSum('hashtags-summary-text', 'Hashtags', tags ? tags + (tags > HASHTAG_LIMIT ? ' (over)' : '') : '');
-    setSum('alt-summary-text', 'Image description', alt ? 'filled' : '');
+    setSum('alt-summary-text', 'Image description',
+      altsFilled
+        ? (alts.length > 1 ? altsFilled + ' of ' + alts.length + ' filled' : 'filled')
+        : '');
     setSum('media-summary-text', 'Image or video',
       currentFiles.length
         ? (currentFiles.length === 1 ? 'attached' : currentFiles.length + ' attached')
@@ -1471,7 +1467,7 @@ text-align: center;
       preview.textContent = output;
       preview.classList.remove('empty');
     } else {
-      preview.textContent = 'Empty -- fill in any field above.';
+      preview.textContent = 'Empty — fill in any field above.';
       preview.classList.add('empty');
     }
 
@@ -1491,20 +1487,19 @@ text-align: center;
   function saveCurrent() {
     store_set('current', {
       caption: getCaption(),
-      mentions: getMentions(),
       hashtags: getHashtags(),
-      alt: getAlt(),
+      alts: getAlts(),
       position: getPosition()
     });
   }
 
   function loadCurrent() {
     const s = store_get('current');
-    if (!s) { renderMentions([]); return; }
+    if (!s) { renderAltFields([]); return; }
     $('caption').value = s.caption || '';
     $('hashtags').value = s.hashtags || '';
-    $('alt').value = s.alt || '';
-    renderMentions(s.mentions || []);
+    const alts = Array.isArray(s.alts) ? s.alts : (s.alt ? [s.alt] : []);
+    renderAltFields(alts);
     const r = document.querySelector('input[name="position"][value="' + (s.position || 'start') + '"]');
     if (r) r.checked = true;
   }
@@ -1558,15 +1553,14 @@ text-align: center;
   }
 
   function clearAll() {
-    if (!confirm('Clear all fields? Your drafts, templates and favourites will be kept.')) return;
+    if (!confirm('Clear all fields? Your drafts, templates and saved mentions will be kept.')) return;
     $('caption').value = '';
     $('hashtags').value = '';
-    $('alt').value = '';
-    renderMentions([]);
     const startRadio = document.querySelector('input[name="position"][value="start"]');
     if (startRadio) startRadio.checked = true;
     $('media').value = '';
     clearMediaPreview();
+    renderAltFields([]);
     update();
     showStatus('Cleared.');
   }
@@ -1582,39 +1576,43 @@ text-align: center;
   function handleMedia(e) {
     const files = Array.from(e.target.files || []);
     clearMediaPreview();
-    if (!files.length) { updateSummaries(); return; }
     currentFiles = files;
-    const preview = $('media-preview');
-    files.forEach((file) => {
-      const url = URL.createObjectURL(file);
-      currentMediaUrls.push(url);
-      const item = document.createElement('div');
-      item.className = 'media-item';
-      if (file.type.indexOf('image/') === 0) {
-        const img = document.createElement('img');
-        img.src = url; img.alt = 'Preview of ' + file.name;
-        item.appendChild(img);
-      } else if (file.type.indexOf('video/') === 0) {
-        const v = document.createElement('video');
-        v.src = url; v.controls = true;
-        item.appendChild(v);
-      }
-      const cap = document.createElement('p');
-      cap.className = 'media-caption'; cap.textContent = file.name;
-      item.appendChild(cap);
-      preview.appendChild(item);
-    });
-    preview.hidden = false;
-    updateSummaries();
+    if (files.length) {
+      const preview = $('media-preview');
+      files.forEach((file) => {
+        const url = URL.createObjectURL(file);
+        currentMediaUrls.push(url);
+        const item = document.createElement('div');
+        item.className = 'media-item';
+        if (file.type.indexOf('image/') === 0) {
+          const img = document.createElement('img');
+          img.src = url; img.alt = 'Preview of ' + file.name;
+          item.appendChild(img);
+        } else if (file.type.indexOf('video/') === 0) {
+          const v = document.createElement('video');
+          v.src = url; v.controls = true;
+          item.appendChild(v);
+        }
+        const cap = document.createElement('p');
+        cap.className = 'media-caption'; cap.textContent = file.name;
+        item.appendChild(cap);
+        preview.appendChild(item);
+      });
+      preview.hidden = false;
+    }
+    renderAltFields([]);
+    update();
   }
 
   setupSectionToggles();
-  ['caption', 'hashtags', 'alt'].forEach(id => {
+  ['caption', 'hashtags'].forEach(id => {
     $(id).addEventListener('input', update);
   });
   document.querySelectorAll('input[name="position"]').forEach(r => r.addEventListener('change', update));
-  $('add-mention-btn').addEventListener('click', () => { addMentionRow('', true); update(); });
-  $('save-mention-favs-btn').addEventListener('click', saveMentionsToFavs);
+  $('add-mention-fav-btn').addEventListener('click', addMentionFavourite);
+  $('new-mention-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addMentionFavourite(); }
+  });
   $('save-hashtag-favs-btn').addEventListener('click', saveHashtagsToFavs);
   $('save-template-btn').addEventListener('click', saveTemplate);
   $('template-name').addEventListener('keydown', (e) => {
